@@ -7,6 +7,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include "Dragon.h"
 
 #include <math.h>
@@ -102,6 +106,16 @@ int main(void) {
 
         Renderer renderer;
 
+        // IMGUI
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init(glsl_version);
+
         Vector4 dragonPos{ 0.f, 0.f, 15.f };
         Vector4 camPos{ 0.f, 15.f, 0.f };
         Light gLight;
@@ -115,6 +129,10 @@ int main(void) {
             int width, height;
             renderer.Resize(window, &width, &height);
             renderer.Clear();
+
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
             //glm::mat4 model = glm::translate(glm::mat4(1.0f), translation); // object translate up and right
             //MODEL = TRANSLATE * ROTATION * SCALE
@@ -183,6 +201,21 @@ int main(void) {
 
             renderer.Draw(va, ib, shader);
 
+            {
+                static float f = 0.0f;
+                static int counter = 0;
+
+                ImGui::Begin("Editor");
+                ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 960.0f);
+
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::End();
+            }
+
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
 
@@ -190,6 +223,10 @@ int main(void) {
             glfwPollEvents();
         }
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwTerminate();
     return 0;
