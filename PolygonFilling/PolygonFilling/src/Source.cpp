@@ -18,26 +18,9 @@ struct Vector4
     float x, y, z, w;
 };
 
-static Vector4 GetPosition(const float* vertices, int count) {
-    float x = 0.f, y = 0.f, z = 0.f;
-    for (int i = 0; i < count; i += 8)
-    {
-        x += vertices[i];
-        y += vertices[i + 1];
-        z += vertices[i + 2];
-    }
-    float denom = count / 8.f;
-    return Vector4{ x / denom, y / denom, z / denom, 1.f };
-}
-
 struct Light {
     glm::vec3 position;
     glm::vec3 intensities; //a.k.a. the color of the light
-};
-
-
-struct Vertex {
-    Vector4 Position;
 };
 
 int main(void) {
@@ -72,18 +55,6 @@ int main(void) {
     }
 
     {
-        Vertex vertices[] = {
-            {{-50.0f, -50.0f, 0.0f, 1.0f}},
-            {{50.0f, -50.0f, 0.0f, 1.0f}},
-            {{50.0f, 50.0f, 0.0f, 1.0f}},
-            {{-50.0f, 50.0f, 0.0f, 1.0f}}
-        };
-
-        unsigned int indices[] = {
-            0, 1, 2,
-            2, 3, 0
-        };
-
         // BLENDING
 
         GLCall(glEnable(GL_BLEND));
