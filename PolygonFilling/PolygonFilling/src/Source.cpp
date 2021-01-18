@@ -15,6 +15,8 @@
 
 #include <math.h>
 
+#include "Maths/Polygon.h"
+
 #define PI 3.141592653589793f
 
 struct Vector4
@@ -28,6 +30,16 @@ struct Light {
 };
 
 int main(void) {
+    std::vector<Point> points;
+    points.push_back(Point(0.0f, 0.0f));
+    points.push_back(Point(1.0f, 0.0f));
+    points.push_back(Point(1.0f, 1.0f));
+    points.push_back(Point(0.0f, 1.0f));
+    Polygon poly(points);
+
+    bool inside = poly.IsInside(Point(1.5f, 0.5f));
+
+    return 0;
     GLFWwindow* window;
 
     /* Initialize the library */
@@ -124,6 +136,7 @@ int main(void) {
         gLight.intensities = glm::vec3(1, 1, 1); //white
 
         glm::vec3 translation(200, 200, 0);
+        bool my_tool_active = true;
         while (!glfwWindowShouldClose(window))
         {
             int width, height;
@@ -138,7 +151,7 @@ int main(void) {
             //MODEL = TRANSLATE * ROTATION * SCALE
             //glm::mat4 mvp = proj * view * model; // reversed because opengl
             float time = static_cast<float>(glfwGetTime());
-            //time = 0.f;
+            time = 0.f;
 
             float translationMatrix[] = {
                 1.f, 0.f, 0.f, 0.f,
@@ -172,7 +185,7 @@ int main(void) {
             };
 
             // proj
-            float fov = 45.f * 3.14159f / 180.f;
+            float fov = 45.f * PI / 180.f;
             float f = 1.f / tan(fov / 2.f);
             float a = (float)width / (float)height;
             float far = 100.f;
@@ -202,14 +215,29 @@ int main(void) {
             renderer.Draw(va, ib, shader);
 
             {
-                static float f = 0.0f;
-                static int counter = 0;
+                ImGui::Begin("Polygon clipping and filling", &my_tool_active, ImGuiWindowFlags_MenuBar);
+                if (ImGui::BeginMenuBar())
+                {
+                    if (ImGui::BeginMenu("Menu"))
+                    {
+                        if (ImGui::MenuItem("Colors", "")) { /* Do stuff */ }
+                        if (ImGui::MenuItem("Polygon to cut", "")) { /* Do stuff */ }
+                        if (ImGui::MenuItem("Draw window", "")) { /* Do stuff */ }
+                        if (ImGui::MenuItem("Clipping", "")) { /* Do stuff */ }
+                        if (ImGui::MenuItem("Filling", "")) { /* Do stuff */ }
+                        ImGui::EndMenu();
+                    }
+                    ImGui::EndMenuBar();
+                }
+                ImGui::End();
 
+                /*
                 ImGui::Begin("Editor");
-                ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 960.0f);
+                ImGui::SliderFloat3("Translation", &camPos.x, -50.0f, 50.0f);
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
                 ImGui::End();
+                */
             }
 
 
