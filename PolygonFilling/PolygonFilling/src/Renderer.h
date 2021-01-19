@@ -19,5 +19,5 @@ class Renderer {
 public:
     void Resize(GLFWwindow* window, int* width, int* height);
     void Clear() const;
-    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, GLenum mode) const;
 };

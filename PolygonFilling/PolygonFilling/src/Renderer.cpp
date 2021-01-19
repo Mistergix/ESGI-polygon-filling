@@ -34,11 +34,22 @@ void Renderer::Clear() const
     GLCall(glClear(GL_COLOR_BUFFER_BIT));
 }
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader, GLenum mode) const
 {
     shader.Bind();
     va.Bind();
     ib.Bind();
 
-    GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
+    /*if (mode == GL_POLYGON) {
+        glPolygonMode(GL_FRONT, GL_LINE);
+    }
+    if (mode == GL_POINT) {
+        glPointSize(5.f);
+        
+    }
+    if (mode == GL_LINES) {
+        glLineWidth(5.f);
+    }*/
+
+    GLCall(glDrawElements(mode, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 }

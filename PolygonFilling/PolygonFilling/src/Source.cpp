@@ -120,6 +120,7 @@ int main(void) {
         Color polygonColor, windowPolygonColor, cutPolygonColor;
         Sutherland sutherland;
         Drawing drawing(window);
+        GLenum mode;
 
         while (!glfwWindowShouldClose(window))
         {
@@ -136,11 +137,11 @@ int main(void) {
 
             Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
 
-            drawing.DrawPolygon(windowPolygon, windowPolygonColor);
-            drawing.DrawPolygon(polygon, polygonColor);
+            //drawing.DrawPolygon(windowPolygon, windowPolygonColor);
+            //drawing.DrawPolygon(polygon, polygonColor);
             drawing.Fill(cutPolygon, cutPolygonColor);
 
-            renderer.Draw(va, ib, shader);
+            renderer.Draw(va, ib, shader, mode);
 
             {
                 ImGui::Begin("Polygon clipping and filling", &my_tool_active, ImGuiWindowFlags_MenuBar);
@@ -156,6 +157,18 @@ int main(void) {
                     ImGui::EndMenuBar();
                 }
                 ImGui::End();
+
+                /*
+                ImGui::Begin("Render Mode", &my_tool_active, ImGuiWindowFlags_MenuBar);
+                if (ImGui::BeginMenuBar()) {
+                    if (ImGui::MenuItem("Points", "")) mode == GL_POINTS;
+                    if (ImGui::MenuItem("Lines", "")) mode == GL_LINES;
+                    if (ImGui::MenuItem("OutLines", "")) mode == GL_POLYGON;
+                    if (ImGui::MenuItem("Filled", "")) mode == GL_TRIANGLES;
+                    ImGui::EndMenuBar();
+                }
+                ImGui::End();
+                */
             }
 
 
