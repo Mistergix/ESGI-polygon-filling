@@ -14,6 +14,8 @@ public:
 		return (a.getX() * b.getY() - a.getY() * b.getX()) == 0;
 	}
 
+	float Scalar(Vector a, Vector b);
+
 	Vector Product(Mat2 m, Vector v) {
 		float M = m.a * v.getX() + m.b * v.getY();
 		float N = m.c * v.getX() + m.d * v.getY();

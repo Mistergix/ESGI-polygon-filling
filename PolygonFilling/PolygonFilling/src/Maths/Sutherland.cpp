@@ -21,14 +21,19 @@ Vector Sutherland::Intersection(Vector S, Vector Pj, Vector Fi, Vector Fiplus1)
 	Mat2 inv = m_maths.Inverse(A);
 	Vector ts = m_maths.Product(inv, Vector{ Fi.getX() - S.getX(), Fi.getY() - S.getY() });
 	Vector a = m_maths.Add(S, m_maths.Multiply(m_maths.Add(Pj, m_maths.Multiply(S, -1)), ts.getX()));
-	Vector b = m_maths.Add(Fi, m_maths.Multiply(m_maths.Add(Fiplus1, m_maths.Multiply(Fi, -1)), ts.getY()));
+	// Vector b = m_maths.Add(Fi, m_maths.Multiply(m_maths.Add(Fiplus1, m_maths.Multiply(Fi, -1)), ts.getY())); // a and b are equal
 
 	return a;
 }
 
-bool Sutherland::Visible(Vector S, Vector Fi, Vector Fiplus1)
+bool Sutherland::Visible(Vector S, Vector Fi, Vector Fiplus1, Polygon windowPolygon)
 {
-	return false;
+	Vector normal = windowPolygon.GetNormalInterior(Fi, Fiplus1);
+	Vector a{ S.getX() - Fi.getX(), S.getY() - Fi.getY() };
+
+	float scalar = m_maths.Scalar(normal, a);
+
+	return scalar >= 0.0f;
 }
 
 Sutherland::Sutherland()

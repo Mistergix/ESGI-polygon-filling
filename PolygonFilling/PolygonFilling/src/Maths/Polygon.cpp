@@ -11,6 +11,16 @@ Polygon::Polygon(std::vector<Vector> points)
 	m_points = points;
 }
 
+bool Polygon::IsTrigonometric()
+{
+	return trigonometricOrientation;
+}
+
+void Polygon::SetTrigonometric(bool trigo)
+{
+	trigonometricOrientation = trigo;
+}
+
 //https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
 bool Polygon::IsInside(Vector p)
 {	 
@@ -44,6 +54,15 @@ void Polygon::Add(Vector pt)
 void Polygon::Clear()
 {
 	m_points.clear();
+}
+
+Vector Polygon::GetNormalInterior(Vector a, Vector b)
+{
+	if (trigonometricOrientation) {
+		return Vector{ -(b.getY() - a.getY()), b.getX() - a.getX() };
+	}
+
+	return Vector{ b.getY() - a.getY(), -(b.getX() - a.getX()) };
 }
 
 std::vector<Vector> Polygon::GetPoints()

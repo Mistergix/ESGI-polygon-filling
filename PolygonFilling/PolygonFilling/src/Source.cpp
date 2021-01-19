@@ -22,6 +22,8 @@
 
 
 int main(void) {
+    // ON SUPPOSE SENS TRIGO POUR LE MOMENT
+
     std::vector<Vector> points;
     points.push_back(Vector(0.0f, 0.0f));
     points.push_back(Vector(1.0f, 0.0f));
@@ -29,9 +31,13 @@ int main(void) {
     points.push_back(Vector(0.0f, 1.0f));
     Polygon poly(points);
 
+    poly.SetTrigonometric(true);
+
     bool inside = poly.IsInside(Vector(1.5f, 0.5f));
 
     Sutherland s;
+
+    // TEST INTERSECTION
 
     bool inter1 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.5f), Vector(3.0f, 0.5f)); // inter sommet du milieu
     bool inter2 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.0f), Vector(3.0f, 0.0f)); // inter sommet du bas
@@ -61,6 +67,8 @@ int main(void) {
     ASSERT(! inter10);
     ASSERT(inter11);
 
+
+    // TEST INTERSECTION CALCUL POINT
     Vector inter1v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.5f), Vector(3.0f, 0.5f)); // inter sommet du milieu
     Vector inter2v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.0f), Vector(3.0f, 0.0f)); // inter sommet du bas
     Vector inter3v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 1.0f), Vector(3.0f, 1.0f)); // inter sommet du haut
@@ -69,6 +77,53 @@ int main(void) {
     Vector inter9v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f / 5.0f, 1.0f / 5.0f), Vector(4.0f / 5.0f, 2.0f / 5.0f)); // fenetre oblique, inter bas
 
     Vector inter11v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(-1.0f, 0.5f), Vector(1.0f, 0.5f)); // inter segments
+
+
+    // TEST VISIBLE 
+    Polygon subject;
+
+    subject.SetTrigonometric(true);
+
+    subject.Add(Vector(0.0f, 0.0f));
+    subject.Add(Vector(1.0f, 0.0f));
+    subject.Add(Vector(2.0f, 2.0f));
+    subject.Add(Vector(0.5f, 1.0f));
+    subject.Add(Vector(-1.0f, 2.0f));
+
+    Polygon clipPolygon;
+
+    clipPolygon.SetTrigonometric(true);
+
+    clipPolygon.Add(Vector(-1.0f, 0.5f));
+    clipPolygon.Add(Vector(2.0f, 0.5f));
+    clipPolygon.Add(Vector(2.0f, 1.25f));
+    clipPolygon.Add(Vector(-1.0f, 1.25f));
+
+    bool visible1 = s.Visible(Vector(0.0f, 0.0f), Vector(-1.0f, 0.5f), Vector(2.0f, 0.5f), clipPolygon); // NOT VISIBLE
+    bool visible2 = s.Visible(Vector(0.0f, 0.0f), Vector(2.0f, 0.5f), Vector(2.0f, 1.25f), clipPolygon); // VISIBLE
+
+    bool visible3 = s.Visible(Vector(0.5f, 1.0f), Vector(2.0f, 0.5f), Vector(2.0f, 1.25f), clipPolygon); // VISIBLE
+    bool visible4 = s.Visible(Vector(0.5f, 1.0f), Vector(2.0f, 1.25f), Vector(-1.0f, 1.25f), clipPolygon); // VISIBLE
+    bool visible5 = s.Visible(Vector(0.5f, 1.0f), Vector(-1.0f, 1.25f), Vector(-1.0f, 0.5f), clipPolygon); // VISIBLE
+    bool visible6 = s.Visible(Vector(0.5f, 1.0f), Vector(-1.0f, 0.5f), Vector(2.0f, 0.5f), clipPolygon); // VISIBLE
+
+    bool visible7 = s.Visible(Vector(2.0f, 2.0f), Vector(2.0f, 0.5f), Vector(2.0f, 1.25f), clipPolygon); // VISIBLE
+    bool visible8 = s.Visible(Vector(2.0f, 2.0f), Vector(2.0f, 1.25f), Vector(-1.0f, 1.25f), clipPolygon); // NOT VISIBLE
+    bool visible9 = s.Visible(Vector(2.0f, 2.0f), Vector(-1.0f, 1.25f), Vector(-1.0f, 0.5f), clipPolygon); // VISIBLE
+    bool visible10 = s.Visible(Vector(2.0f, 2.0f), Vector(-1.0f, 0.5f), Vector(2.0f, 0.5f), clipPolygon); // VISIBLE
+
+    ASSERT(! visible1);
+    ASSERT(visible2);
+
+    ASSERT(visible3);
+    ASSERT(visible4);
+    ASSERT(visible5);
+    ASSERT(visible6);
+
+    ASSERT(visible7);
+    ASSERT(! visible8);
+    ASSERT(visible9);
+    ASSERT(visible10);
 
     return 0;
     /*

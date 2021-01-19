@@ -9,6 +9,6 @@ public:
 	Sutherland();
 	Polygon Clip(Polygon poly, Polygon window);
 	bool Cut(Vector S, Vector Pj, Vector Fi, Vector Fiplus1);
-	bool Visible(Vector S, Vector Fi, Vector Fiplus1);
+	bool Visible(Vector S, Vector Fi, Vector Fiplus1, Polygon windowPolygon);
 	Vector Intersection(Vector S, Vector Pj, Vector Fi, Vector Fiplus1);
 };
