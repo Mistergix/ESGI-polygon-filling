@@ -119,7 +119,7 @@ int main(void) {
         Polygon polygon, windowPolygon;
         Color polygonColor, windowPolygonColor, cutPolygonColor;
         Sutherland sutherland;
-        Drawing drawing;
+        Drawing drawing(window);
 
         while (!glfwWindowShouldClose(window))
         {
