@@ -269,8 +269,8 @@ int main(void) {
                 if (show_colors) {
                     ImGui::Begin("Colors");
                     ImGui::ColorEdit4("Polygon Color", &polygonColor.r);
-                    ImGui::ColorEdit4("Window Color", &windowPolygonColor.r);
-                    ImGui::ColorEdit4("Cut Poylgon Color", &cutPolygonColor.r);
+                    ImGui::ColorEdit4("Window Polygon Color", &windowPolygonColor.r);
+                    ImGui::ColorEdit4("Cut Polygon Color", &cutPolygonColor.r);
                     ImGui::End();
                 }
             }
