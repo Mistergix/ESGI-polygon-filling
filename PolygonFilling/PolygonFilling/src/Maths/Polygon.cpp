@@ -1,5 +1,11 @@
 #include "Polygon.h"
 
+Polygon::Polygon()
+{
+	std::vector<Point> vector;
+	m_points = vector;
+}
+
 Polygon::Polygon(std::vector<Point> points)
 {
 	m_points = points;

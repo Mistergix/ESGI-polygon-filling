@@ -19,6 +19,10 @@
 
 #define PI 3.141592653589793f
 
+struct Color {
+    float r, g, b;
+};
+
 int main(void) {
     std::vector<Point> points;
     points.push_back(Point(0.0f, 0.0f));
@@ -114,6 +118,11 @@ int main(void) {
 
 
         bool my_tool_active = true;
+        Polygon polygon, windowPolygon;
+        Color polygonColor, windowPolygonColor, cutPolygonColor, fillingColor;
+        Sutherland sutherland;
+        LCA lca;
+
         while (!glfwWindowShouldClose(window))
         {
             int width, height;
@@ -125,6 +134,9 @@ int main(void) {
             ImGui::NewFrame();
 
             shader.Bind();
+
+            Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
+            lca.Fill(cutPolygon);
 
             renderer.Draw(va, ib, shader);
 
