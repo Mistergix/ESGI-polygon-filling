@@ -22,32 +22,53 @@
 
 
 int main(void) {
-    std::vector<Point> points;
-    points.push_back(Point(0.0f, 0.0f));
-    points.push_back(Point(1.0f, 0.0f));
-    points.push_back(Point(1.0f, 1.0f));
-    points.push_back(Point(0.0f, 1.0f));
+    std::vector<Vector> points;
+    points.push_back(Vector(0.0f, 0.0f));
+    points.push_back(Vector(1.0f, 0.0f));
+    points.push_back(Vector(1.0f, 1.0f));
+    points.push_back(Vector(0.0f, 1.0f));
     Polygon poly(points);
 
-    bool inside = poly.IsInside(Point(1.5f, 0.5f));
+    bool inside = poly.IsInside(Vector(1.5f, 0.5f));
 
     Sutherland s;
 
-    bool inter1 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 0.5f), Point(3.0f, 0.5f)); // inter sommet du milieu
-    bool inter2 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 0.0f), Point(3.0f, 0.0f)); // inter sommet du bas
-    bool inter3 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 1.0f), Point(3.0f, 1.0f)); // inter sommet du haut
+    bool inter1 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.5f), Vector(3.0f, 0.5f)); // inter sommet du milieu
+    bool inter2 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.0f), Vector(3.0f, 0.0f)); // inter sommet du bas
+    bool inter3 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 1.0f), Vector(3.0f, 1.0f)); // inter sommet du haut
 
-    bool inter4 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, -1.0f), Point(3.0f, -1.0f)); // en dessous
-    bool inter5 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 2.0f), Point(3.0f, 2.0f)); // au dessus
+    bool inter4 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, -1.0f), Vector(3.0f, -1.0f)); // en dessous
+    bool inter5 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 2.0f), Vector(3.0f, 2.0f)); // au dessus
 
-    bool inter6 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 0.0f), Point(2.0f, 2.0f)); // paralelle
-    bool inter7 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(0.0f, -1.0f), Point(0.0f, 0.5f)); // confondue
+    bool inter6 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.0f), Vector(2.0f, 2.0f)); // paralelle
+    bool inter7 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(0.0f, -1.0f), Vector(0.0f, 0.5f)); // confondue
 
-    bool inter8 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f / 5.0f, 2.0f / 5.0f), Point(4.0f / 5.0f, 3.0f / 5.0f)); // fenetre oblique
-    bool inter9 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f / 5.0f, 1.0f / 5.0f), Point(4.0f / 5.0f, 2.0f / 5.0f)); // fenetre oblique, inter bas
-    bool inter10 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f / 5.0f, 0.0f / 5.0f), Point(4.0f / 5.0f, 1.0f / 5.0f)); // fenetre oblique pas d'inter
+    bool inter8 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f / 5.0f, 2.0f / 5.0f), Vector(4.0f / 5.0f, 3.0f / 5.0f)); // fenetre oblique
+    bool inter9 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f / 5.0f, 1.0f / 5.0f), Vector(4.0f / 5.0f, 2.0f / 5.0f)); // fenetre oblique, inter bas
+    bool inter10 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f / 5.0f, 0.0f / 5.0f), Vector(4.0f / 5.0f, 1.0f / 5.0f)); // fenetre oblique pas d'inter
 
-    bool inter11 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(-1.0f, 0.5f), Point(1.0f, 0.5f)); // inter segments
+    bool inter11 = s.Cut(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(-1.0f, 0.5f), Vector(1.0f, 0.5f)); // inter segments
+
+    ASSERT(inter1);
+    ASSERT(inter2);
+    ASSERT(inter3);
+    ASSERT(! inter4);
+    ASSERT(! inter5);
+    ASSERT(! inter6);
+    ASSERT(! inter7);
+    ASSERT(inter8);
+    ASSERT(inter9);
+    ASSERT(! inter10);
+    ASSERT(inter11);
+
+    Vector inter1v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.5f), Vector(3.0f, 0.5f)); // inter sommet du milieu
+    Vector inter2v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 0.0f), Vector(3.0f, 0.0f)); // inter sommet du bas
+    Vector inter3v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f, 1.0f), Vector(3.0f, 1.0f)); // inter sommet du haut
+
+    Vector inter8v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f / 5.0f, 2.0f / 5.0f), Vector(4.0f / 5.0f, 3.0f / 5.0f)); // fenetre oblique
+    Vector inter9v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(2.0f / 5.0f, 1.0f / 5.0f), Vector(4.0f / 5.0f, 2.0f / 5.0f)); // fenetre oblique, inter bas
+
+    Vector inter11v = s.Intersection(Vector(0.0f, 0.0f), Vector(0.0f, 1.0f), Vector(-1.0f, 0.5f), Vector(1.0f, 0.5f)); // inter segments
 
     return 0;
     /*

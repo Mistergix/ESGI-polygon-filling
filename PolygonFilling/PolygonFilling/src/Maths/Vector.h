@@ -1,11 +1,11 @@
 #pragma once
 
-class Point {
+class Vector {
 private :
 	float m_x, m_y;
 public :
 	float getX();
 	float getY();
-	Point(float, float);
-	Point();
+	Vector(float, float);
+	Vector();
 };

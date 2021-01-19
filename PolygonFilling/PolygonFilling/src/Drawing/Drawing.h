@@ -14,7 +14,7 @@ private :
 public:
 	Drawing(GLFWwindow* window);
 	void DrawPixel(int x, int y, Color c);
-	void DrawLine(Point a, Point b, Color c);
+	void DrawLine(Vector a, Vector b, Color c);
 	void DrawPolygon(Polygon p, Color c);
 	void Fill(Polygon p, Color c);
 };

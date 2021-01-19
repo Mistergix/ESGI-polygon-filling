@@ -1,5 +1,5 @@
 #pragma once
-#include "Point.h"
+#include "Vector.h"
 #include <vector>
 
 struct BoundingBox {
@@ -8,14 +8,14 @@ struct BoundingBox {
 
 class Polygon {
 private:
-	std::vector<Point> m_points;
+	std::vector<Vector> m_points;
 
 public:
 	Polygon();
-	Polygon(std::vector<Point> points);
-	bool IsInside(Point pt);
-	void Add(Point pt);
+	Polygon(std::vector<Vector> points);
+	bool IsInside(Vector pt);
+	void Add(Vector pt);
 	void Clear();
-	std::vector<Point> GetPoints();
+	std::vector<Vector> GetPoints();
 	BoundingBox GetBoundingBox();
 };

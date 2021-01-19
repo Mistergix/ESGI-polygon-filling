@@ -2,17 +2,17 @@
 
 Polygon::Polygon()
 {
-	std::vector<Point> vector;
+	std::vector<Vector> vector;
 	m_points = vector;
 }
 
-Polygon::Polygon(std::vector<Point> points)
+Polygon::Polygon(std::vector<Vector> points)
 {
 	m_points = points;
 }
 
 //https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
-bool Polygon::IsInside(Point p)
+bool Polygon::IsInside(Vector p)
 {	 
 	BoundingBox b = GetBoundingBox();
 
@@ -36,7 +36,7 @@ bool Polygon::IsInside(Point p)
 	return inside;
 }
 
-void Polygon::Add(Point pt)
+void Polygon::Add(Vector pt)
 {
 	m_points.push_back(pt);
 }
@@ -46,7 +46,7 @@ void Polygon::Clear()
 	m_points.clear();
 }
 
-std::vector<Point> Polygon::GetPoints()
+std::vector<Vector> Polygon::GetPoints()
 {
 	return m_points;
 }
@@ -63,7 +63,7 @@ BoundingBox Polygon::GetBoundingBox()
 	// compute bounding box
 	for (int i = 1; i < count; i++)
 	{
-		Point q = m_points[i];
+		Vector q = m_points[i];
 		minX = std::min(q.getX(), minX);
 		maxX = std::max(q.getX(), maxX);
 		minY = std::min(q.getY(), minY);

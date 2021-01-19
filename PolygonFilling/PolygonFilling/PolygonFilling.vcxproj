@@ -150,7 +150,7 @@
     <ClCompile Include="src\Maths\LCA.cpp" />
     <ClCompile Include="src\Maths\Maths.cpp" />
     <ClCompile Include="src\Maths\Sutherland.cpp" />
-    <ClCompile Include="src\Maths\Point.cpp" />
+    <ClCompile Include="src\Maths\Vector.cpp" />
     <ClCompile Include="src\Maths\Polygon.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -174,7 +174,7 @@
     <ClInclude Include="src\Maths\LCA.h" />
     <ClInclude Include="src\Maths\Maths.h" />
     <ClInclude Include="src\Maths\Sutherland.h" />
-    <ClInclude Include="src\Maths\Point.h" />
+    <ClInclude Include="src\Maths\Vector.h" />
     <ClInclude Include="src\Maths\Polygon.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Shader.h" />
