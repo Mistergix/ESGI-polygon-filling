@@ -145,7 +145,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Drawing\Drawing.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
+    <ClCompile Include="src\Maths\LCA.cpp" />
+    <ClCompile Include="src\Maths\Maths.cpp" />
+    <ClCompile Include="src\Maths\Sutherland.cpp" />
     <ClCompile Include="src\Maths\Point.cpp" />
     <ClCompile Include="src\Maths\Polygon.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -165,7 +169,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Dragon.h" />
+    <ClInclude Include="src\Drawing\Drawing.h" />
     <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\Maths\LCA.h" />
+    <ClInclude Include="src\Maths\Maths.h" />
+    <ClInclude Include="src\Maths\Sutherland.h" />
     <ClInclude Include="src\Maths\Point.h" />
     <ClInclude Include="src\Maths\Polygon.h" />
     <ClInclude Include="src\Renderer.h" />

@@ -31,10 +31,29 @@ int main(void) {
 
     bool inside = poly.IsInside(Point(1.5f, 0.5f));
 
+    Sutherland s;
+
+    bool inter1 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 0.5f), Point(3.0f, 0.5f)); // inter sommet du milieu
+    bool inter2 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 0.0f), Point(3.0f, 0.0f)); // inter sommet du bas
+    bool inter3 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 1.0f), Point(3.0f, 1.0f)); // inter sommet du haut
+
+    bool inter4 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, -1.0f), Point(3.0f, -1.0f)); // en dessous
+    bool inter5 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 2.0f), Point(3.0f, 2.0f)); // au dessus
+
+    bool inter6 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f, 0.0f), Point(2.0f, 2.0f)); // paralelle
+    bool inter7 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(0.0f, -1.0f), Point(0.0f, 0.5f)); // confondue
+
+    bool inter8 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f / 5.0f, 2.0f / 5.0f), Point(4.0f / 5.0f, 3.0f / 5.0f)); // fenetre oblique
+    bool inter9 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f / 5.0f, 1.0f / 5.0f), Point(4.0f / 5.0f, 2.0f / 5.0f)); // fenetre oblique, inter bas
+    bool inter10 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(2.0f / 5.0f, 0.0f / 5.0f), Point(4.0f / 5.0f, 1.0f / 5.0f)); // fenetre oblique pas d'inter
+
+    bool inter11 = s.Cut(Point(0.0f, 0.0f), Point(0.0f, 1.0f), Point(-1.0f, 0.5f), Point(1.0f, 0.5f)); // inter segments
+
     return 0;
+    /*
     GLFWwindow* window;
 
-    /* Initialize the library */
+    // Initialize the library 
     if (!glfwInit())
         return -1;
 
@@ -44,7 +63,7 @@ int main(void) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    /* Create a windowed mode window and its OpenGL context */
+    // Create a windowed mode window and its OpenGL context 
     window = glfwCreateWindow(1000, 1000, "Clipping and Windowing", NULL, NULL);
     if (!window)
     {
@@ -52,7 +71,7 @@ int main(void) {
         return -1;
     }
 
-    /* Make the window's context current */
+    //Make the window's context current 
     glfwMakeContextCurrent(window);
 
     // vsync
@@ -116,10 +135,12 @@ int main(void) {
 
 
         bool my_tool_active = true;
-        Polygon polygon, windowPolygon;
+        Polygon polygon, windowPolygon, currentPolygon;
         Color polygonColor, windowPolygonColor, cutPolygonColor;
         Sutherland sutherland;
         Drawing drawing(window);
+
+        currentPolygon = polygon;
 
         while (!glfwWindowShouldClose(window))
         {
@@ -134,11 +155,11 @@ int main(void) {
 
             shader.Bind();
 
-            Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
+            //Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
 
-            drawing.DrawPolygon(windowPolygon, windowPolygonColor);
-            drawing.DrawPolygon(polygon, polygonColor);
-            drawing.Fill(cutPolygon, cutPolygonColor);
+            //drawing.DrawPolygon(windowPolygon, windowPolygonColor);
+            //drawing.DrawPolygon(polygon, polygonColor);
+            //drawing.Fill(cutPolygon, cutPolygonColor);
 
             renderer.Draw(va, ib, shader);
 
@@ -148,9 +169,9 @@ int main(void) {
                 {
                     if (ImGui::BeginMenu("Menu"))
                     {
-                        if (ImGui::MenuItem("Colors", "")) { /* Do stuff */ }
-                        if (ImGui::MenuItem("Polygon to cut", "")) { /* Do stuff */ }
-                        if (ImGui::MenuItem("Draw window", "")) { /* Do stuff */ }
+                        if (ImGui::MenuItem("Colors", "")) {  }
+                        if (ImGui::MenuItem("Polygon to cut", "")) {  }
+                        if (ImGui::MenuItem("Draw window", "")) {  }
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenuBar();
@@ -162,10 +183,10 @@ int main(void) {
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-            /* Swap front and back buffers */
+            //Swap front and back buffers 
             glfwSwapBuffers(window);
 
-            /* Poll for and process events */
+            //Poll for and process events
             glfwPollEvents();
         }
     }
@@ -176,4 +197,5 @@ int main(void) {
 
     glfwTerminate();
     return 0;
+    */
 }

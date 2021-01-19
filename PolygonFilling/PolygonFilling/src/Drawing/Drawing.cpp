@@ -8,6 +8,6 @@ Drawing::Drawing(GLFWwindow* window)
 
 void Drawing::Fill(Polygon p, Color c)
 {
-	m_lca.Fill(p);
+	//m_lca.Fill(p);
 	// faire quelque chose avec la couleur
 }

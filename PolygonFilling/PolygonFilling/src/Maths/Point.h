@@ -7,4 +7,5 @@ public :
 	float getX();
 	float getY();
 	Point(float, float);
+	Point();
 };

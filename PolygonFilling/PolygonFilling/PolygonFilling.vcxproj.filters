@@ -18,6 +18,10 @@
     <ClCompile Include="src\VertexBuffer.cpp" />
     <ClCompile Include="src\Maths\Point.cpp" />
     <ClCompile Include="src\Maths\Polygon.cpp" />
+    <ClCompile Include="src\Maths\Sutherland.cpp" />
+    <ClCompile Include="src\Maths\LCA.cpp" />
+    <ClCompile Include="src\Drawing\Drawing.cpp" />
+    <ClCompile Include="src\Maths\Maths.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Dragon.h" />
@@ -321,6 +325,10 @@
     <ClInclude Include="src\VertexBufferLayout.h" />
     <ClInclude Include="src\Maths\Point.h" />
     <ClInclude Include="src\Maths\Polygon.h" />
+    <ClInclude Include="src\Maths\Sutherland.h" />
+    <ClInclude Include="src\Maths\LCA.h" />
+    <ClInclude Include="src\Drawing\Drawing.h" />
+    <ClInclude Include="src\Maths\Maths.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl" />

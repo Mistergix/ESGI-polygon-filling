@@ -2,6 +2,10 @@
 #include "Point.h"
 #include <vector>
 
+struct BoundingBox {
+	float xMin, xMax, yMin, yMax;
+};
+
 class Polygon {
 private:
 	std::vector<Point> m_points;
@@ -12,4 +16,6 @@ public:
 	bool IsInside(Point pt);
 	void Add(Point pt);
 	void Clear();
+	std::vector<Point> GetPoints();
+	BoundingBox GetBoundingBox();
 };
