@@ -10,4 +10,6 @@ public:
 	Polygon();
 	Polygon(std::vector<Point> points);
 	bool IsInside(Point pt);
+	void Add(Point pt);
+	void Clear();
 };

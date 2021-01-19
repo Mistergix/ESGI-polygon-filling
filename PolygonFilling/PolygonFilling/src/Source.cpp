@@ -15,13 +15,11 @@
 
 #include "Maths/Polygon.h"
 #include "Maths/Sutherland.h"
-#include "Maths/LCA.h"
+#include "Drawing/Drawing.h"
 
 #define PI 3.141592653589793f
 
-struct Color {
-    float r, g, b;
-};
+
 
 int main(void) {
     std::vector<Point> points;
@@ -119,14 +117,15 @@ int main(void) {
 
         bool my_tool_active = true;
         Polygon polygon, windowPolygon;
-        Color polygonColor, windowPolygonColor, cutPolygonColor, fillingColor;
+        Color polygonColor, windowPolygonColor, cutPolygonColor;
         Sutherland sutherland;
-        LCA lca;
+        Drawing drawing;
 
         while (!glfwWindowShouldClose(window))
         {
             int width, height;
             renderer.Resize(window, &width, &height);
+
             renderer.Clear();
 
             ImGui_ImplOpenGL3_NewFrame();
@@ -136,7 +135,10 @@ int main(void) {
             shader.Bind();
 
             Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
-            lca.Fill(cutPolygon);
+
+            drawing.DrawPolygon(windowPolygon, windowPolygonColor);
+            drawing.DrawPolygon(polygon, polygonColor);
+            drawing.Fill(cutPolygon, cutPolygonColor);
 
             renderer.Draw(va, ib, shader);
 
