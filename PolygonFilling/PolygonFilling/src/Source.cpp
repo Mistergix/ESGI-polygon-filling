@@ -19,7 +19,7 @@
 
 #define PI 3.141592653589793f
 
-
+enum MODE { POLYGON, CLIPPING };
 
 int main(void) {
     // ON SUPPOSE SENS TRIGO POUR LE MOMENT
@@ -127,8 +127,6 @@ int main(void) {
 
     Polygon cut = s.Clip(subject, clipPolygon);
 
-    return 0;
-    /*
     GLFWwindow* window;
 
     // Initialize the library 
@@ -214,11 +212,15 @@ int main(void) {
 
         bool my_tool_active = true;
         Polygon polygon, windowPolygon, currentPolygon;
-        Color polygonColor, windowPolygonColor, cutPolygonColor;
+        Color polygonColor{ 255.0f, 0.0f, 0.0f, 255.0f }, windowPolygonColor{ 0.0f, 255.0f, 0.0f, 255.0f }, cutPolygonColor{ 0.0f, 0.0f, 255.0f, 255.0f };
         Sutherland sutherland;
-        Drawing drawing(window);
+        //Drawing drawing(window);
 
-        currentPolygon = polygon;
+
+        bool clicked = false;
+        MODE mode = POLYGON;
+
+        bool show_colors = false;
 
         while (!glfwWindowShouldClose(window))
         {
@@ -233,7 +235,7 @@ int main(void) {
 
             shader.Bind();
 
-            //Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
+            Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
 
             //drawing.DrawPolygon(windowPolygon, windowPolygonColor);
             //drawing.DrawPolygon(polygon, polygonColor);
@@ -247,14 +249,22 @@ int main(void) {
                 {
                     if (ImGui::BeginMenu("Menu"))
                     {
-                        if (ImGui::MenuItem("Colors", "")) {  }
-                        if (ImGui::MenuItem("Polygon to cut", "")) {  }
-                        if (ImGui::MenuItem("Draw window", "")) {  }
+                        if (ImGui::MenuItem("Colors", "")) { show_colors = !show_colors;  }
+                        if (ImGui::MenuItem("Polygon to cut", "")) { mode = POLYGON; std::cout << mode; }
+                        if (ImGui::MenuItem("Draw window", "")) { mode = CLIPPING;  std::cout << mode; }
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenuBar();
                 }
                 ImGui::End();
+
+                if (show_colors) {
+                    ImGui::Begin("Colors");
+                    ImGui::ColorEdit4("Polygon Color", &polygonColor.r);
+                    ImGui::ColorEdit4("Window Color", &windowPolygonColor.r);
+                    ImGui::ColorEdit4("Cut Poylgon Color", &cutPolygonColor.r);
+                    ImGui::End();
+                }
             }
 
 
@@ -266,6 +276,28 @@ int main(void) {
 
             //Poll for and process events
             glfwPollEvents();
+
+            int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+            if (state == GLFW_PRESS)
+            {
+                if (!clicked) {
+                    clicked = true;
+                    double xpos, ypos;
+                    //getting cursor position
+                    glfwGetCursorPos(window, &xpos, &ypos);
+                    std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
+
+                    if (mode == POLYGON) {
+                        polygon.Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
+                    }
+                    else if (mode == CLIPPING) {
+                        windowPolygon.Add(Vector(xpos + 0.5f, ypos + 0.5f));
+                    }
+                }
+            }
+            else {
+                clicked = false;
+            }
         }
     }
 
@@ -275,5 +307,4 @@ int main(void) {
 
     glfwTerminate();
     return 0;
-    */
 }

@@ -4,7 +4,7 @@
 #include <GLFW\glfw3.h>
 
 struct Color {
-	float r, g, b;
+	float r, g, b, a;
 };
 
 class Drawing {
