@@ -17,7 +17,9 @@ public:
 	void SetTrigonometric(bool trigo);
 	bool IsInside(Vector pt);
 	void Add(Vector pt);
+	Vector GetPoint(int i);
 	void Clear();
+	int PointCount();
 	Vector GetNormalInterior(Vector a, Vector b);
 	std::vector<Vector> GetPoints();
 	BoundingBox GetBoundingBox();

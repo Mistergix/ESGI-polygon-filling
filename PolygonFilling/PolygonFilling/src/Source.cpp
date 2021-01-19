@@ -125,6 +125,8 @@ int main(void) {
     ASSERT(visible9);
     ASSERT(visible10);
 
+    Polygon cut = s.Clip(subject, clipPolygon);
+
     return 0;
     /*
     GLFWwindow* window;

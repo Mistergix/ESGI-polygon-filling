@@ -41,8 +41,46 @@ Sutherland::Sutherland()
 	m_maths = Maths();
 }
 
-Polygon Sutherland::Clip(Polygon poly, Polygon window)
+Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 {
-
-	return Polygon();
+	int N1 = poly.PointCount();
+	int N3 = window.PointCount();
+	Vector F;
+	Vector S;
+	Polygon PL = poly;
+	for (int i = 0; i < N3 - 1; i++)
+	{
+		int N2 = 0;
+		Polygon PS = Polygon();
+		for (int j = 0; j < N1; j++)	
+		{
+			if (j == 0) {
+				F = PL.GetPoint(j);
+			}
+			else
+			{
+				if (Cut(S , PL.GetPoint(j), window.GetPoint(i), window.GetPoint(i+1))) {
+					Vector I = Intersection(S, PL.GetPoint(j), window.GetPoint(i), window.GetPoint(i + 1));
+					PS.Add(I);
+					N2++;
+				}
+			}
+			S = PL.GetPoint(j);
+			if (Visible(S, window.GetPoint(i), window.GetPoint(i + 1), window)) {
+				PS.Add(S);
+				N2++;
+			}
+		}
+		if (N2 > 0) {
+			if (Cut(S, F, window.GetPoint(i), window.GetPoint(i + 1))) {
+				Vector I = Intersection(S, F, window.GetPoint(i), window.GetPoint(i + 1));
+				PS.Add(I);
+				N2++;
+			}
+			PL = PS;
+			N1 = N2;
+		}
+	}
+	return PL;
 }
+ 

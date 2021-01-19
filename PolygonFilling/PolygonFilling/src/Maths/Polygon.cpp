@@ -51,9 +51,19 @@ void Polygon::Add(Vector pt)
 	m_points.push_back(pt);
 }
 
+Vector Polygon::GetPoint(int i)
+{
+	return m_points[i];
+}
+
 void Polygon::Clear()
 {
 	m_points.clear();
+}
+
+int Polygon::PointCount()
+{
+	return m_points.size();
 }
 
 Vector Polygon::GetNormalInterior(Vector a, Vector b)
