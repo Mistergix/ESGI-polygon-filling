@@ -249,9 +249,17 @@ int main(void) {
                 {
                     if (ImGui::BeginMenu("Menu"))
                     {
-                        if (ImGui::MenuItem("Colors", "")) { show_colors = !show_colors;  }
-                        if (ImGui::MenuItem("Polygon to cut", "")) { mode = POLYGON; std::cout << mode; }
-                        if (ImGui::MenuItem("Draw window", "")) { mode = CLIPPING;  std::cout << mode; }
+                        if (ImGui::MenuItem("Colors", "")) { 
+                            show_colors = !show_colors;  
+                        }
+                        if (ImGui::MenuItem("Polygon to cut", "")) { 
+                            mode = POLYGON; 
+                            std::cout << "The mode is " << mode << std::endl; 
+                        }
+                        if (ImGui::MenuItem("Draw window", "")) { 
+                            mode = CLIPPING;  
+                            std::cout << "The mode is " << mode << std::endl;
+                        }
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenuBar();
@@ -289,9 +297,11 @@ int main(void) {
 
                     if (mode == POLYGON) {
                         polygon.Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
+                        std::cout << polygon.PointCount() << std::endl;
                     }
                     else if (mode == CLIPPING) {
                         windowPolygon.Add(Vector(xpos + 0.5f, ypos + 0.5f));
+                        std::cout << windowPolygon.PointCount() << std::endl;
                     }
                 }
             }
