@@ -23,38 +23,58 @@ void Drawing::DrawLine(Vector a, Vector b, Color c, GLubyte(*texture)[SCR_WIDTH]
 	x1 = (int)b.getX();
 	y1 = (int)b.getY();
 
-	if (y1 < y0) {
-		int tmp = y0;
-		y0 = y1;
-		y1 = tmp;
-	}
-
 	if (x0 == x1) {
 		// VERTICAL LINE
-		for (int y = y0; y <= y1; y++)
+		int begin = 0, end = 0;
+		if (y0 < y1) {
+			begin = y0;
+			end = y1;
+		}
+		else
+		{
+			begin = y1;
+			end = y0;
+		}
+
+		for (int y = begin; y <= end; y++)
 		{
 			DrawPixel(x0, y, c, texture);
 		}
+		
 		return;
-	}
-
-	if (x1 < x0) {
-		int tmp = x0;
-		x0 = x1;
-		x1 = tmp;
 	}
 
 	float m = (float)(y1 - y0) / (x1 - x0);
 	float ordonnee = y0 - m * x0;
-	for (int x = x0; x <= x1; x++)
+	int begin, end;
+	if (x0 < x1) {
+		begin = x0;
+		end = x1;
+	}
+	else {
+		begin = x1;
+		end = x0;
+	}
+
+	for (int x = begin; x <= end; x++)
 	{
 		int y = round(m * x + ordonnee);
 		DrawPixel(x, y, c, texture);
 	}
+
+	
 }
 
-void Drawing::DrawPolygon(Polygon p, Color c)
+void Drawing::DrawPolygon(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 {
+	if (p.PointCount() < 2) { return; }
+
+	for (int i = 0; i <= p.PointCount(); i++)
+	{
+		int curr = i % p.PointCount();
+		int next = (i + 1) % p.PointCount();
+		DrawLine(p.GetPoint(curr), p.GetPoint(next), c, texture);
+	}
 }
 
 void Drawing::Fill(Polygon p, Color c)

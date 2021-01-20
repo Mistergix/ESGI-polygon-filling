@@ -255,11 +255,12 @@ int main(void) {
 
 
         bool my_tool_active = true;
-        Polygon polygon, windowPolygon, currentPolygon;
+        Polygon polygon, windowPolygon;
         Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
         Sutherland sutherland;
         
-
+        polygon.SetTrigonometric(true);
+        windowPolygon.SetTrigonometric(true);
 
         bool clicked = false;
         MODE mode = POLYGON;
@@ -276,6 +277,13 @@ int main(void) {
             renderer.Resize(window, &width, &height);
 
             renderer.Clear();
+            for (int i = 0; i < SCR_HEIGHT; i++)
+            {
+                for (int j = 0; j < SCR_WIDTH; j++)
+                {
+                    drawing.DrawPixel(j, i, Color{ 255, 255, 255, 255 }, renderTexture);
+                }
+            }
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -285,18 +293,10 @@ int main(void) {
 
             Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
 
-            //drawing.DrawPolygon(windowPolygon, windowPolygonColor);
-            //drawing.DrawPolygon(polygon, polygonColor);
-            //drawing.Fill(cutPolygon, cutPolygonColor);
-            /*
-            for (int i = 0; i < 100; i++) // height
-            {
-                for (int j = 0; j < 300; j++) // width
-                {
-                    drawing.DrawPixel(j, i, windowPolygonColor, renderTexture);
-                }
-            }*/
-
+            drawing.DrawPolygon(polygon, polygonColor, renderTexture);
+            drawing.DrawPolygon(windowPolygon, windowPolygonColor, renderTexture);
+            drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
+            
             
             
             GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));

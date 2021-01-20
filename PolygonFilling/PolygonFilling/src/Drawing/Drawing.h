@@ -19,6 +19,6 @@ public:
 	Drawing(int w, int h);
 	void DrawPixel(int x, int y, Color c, GLubyte (*texture)[SCR_WIDTH][4]);
 	void DrawLine(Vector a, Vector b, Color c, GLubyte(*texture)[SCR_WIDTH][4]);
-	void DrawPolygon(Polygon p, Color c);
+	void DrawPolygon(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4]);
 	void Fill(Polygon p, Color c);
 };
