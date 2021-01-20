@@ -26,6 +26,14 @@ Vector Sutherland::Intersection(Vector S, Vector Pj, Vector Fi, Vector Fiplus1)
 	return a;
 }
 
+bool Sutherland::IsIntersectionSegmentSegment(Vector S, Vector Pj, Vector Fi, Vector Fiplus1)
+{
+	Mat2 A{ Pj.getX() - S.getX(), Fi.getX() - Fiplus1.getX(), Pj.getY() - S.getY(), Fi.getY() - Fiplus1.getY() };
+	Mat2 inv = m_maths.Inverse(A);
+	Vector ts = m_maths.Product(inv, Vector{ Fi.getX() - S.getX(), Fi.getY() - S.getY() });
+	return 0 <= ts.getX() && ts.getX() <= 1 && 0 <= ts.getY() && ts.getY() <= 1;
+}
+
 bool Sutherland::Visible(Vector S, Vector Fi, Vector Fiplus1, Polygon windowPolygon)
 {
 	Vector normal = windowPolygon.GetNormalInterior(Fi, Fiplus1);
@@ -47,6 +55,8 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 		return Polygon();
 	}
 
+	bool atLeastOneIntersectionSegmentSegment = false;
+
 	int N1 = poly.PointCount();
 	int N3 = window.PointCount();
 	Vector F;
@@ -64,6 +74,7 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 			else
 			{
 				if (Cut(S , PL.GetPoint(j), window.GetPoint(i), window.GetPoint((i + 1) % N3))) {
+					atLeastOneIntersectionSegmentSegment = atLeastOneIntersectionSegmentSegment || IsIntersectionSegmentSegment(S, PL.GetPoint(j), window.GetPoint(i), window.GetPoint((i + 1) % N3));
 					Vector I = Intersection(S, PL.GetPoint(j), window.GetPoint(i), window.GetPoint((i + 1) % N3));
 					PS.Add(I);
 					N2++;
@@ -77,6 +88,7 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 		}
 		if (N2 > 0) {
 			if (Cut(S, F, window.GetPoint(i), window.GetPoint((i + 1) % N3))) {
+				atLeastOneIntersectionSegmentSegment = atLeastOneIntersectionSegmentSegment || IsIntersectionSegmentSegment(S, F, window.GetPoint(i), window.GetPoint((i + 1) % N3));
 				Vector I = Intersection(S, F, window.GetPoint(i), window.GetPoint((i + 1) % N3));
 				PS.Add(I);
 				N2++;
@@ -85,6 +97,11 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 			N1 = N2;
 		}
 	}
+
+	if (!atLeastOneIntersectionSegmentSegment) {
+		return Polygon();
+	}
+
 	return PL;
 }
  
