@@ -296,6 +296,7 @@ int main(void) {
             drawing.DrawPolygon(polygon, polygonColor, renderTexture);
             drawing.DrawPolygon(windowPolygon, windowPolygonColor, renderTexture);
             drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
+            drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
 
 
             GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
@@ -342,6 +343,12 @@ int main(void) {
                         }
                         ImGui::EndMenuBar();
                     }
+
+                    ImGui::TextColored(ImVec4(1, 1, 0, 1), "Polygon Points");
+                    ImGui::BeginChild("Scrolling");
+                    for (int n = 0; n < 50; n++)
+                        ImGui::Text("%04d: Some text", n);
+                    ImGui::EndChild();
                     ImGui::End();
 
                     if (show_colors) {
