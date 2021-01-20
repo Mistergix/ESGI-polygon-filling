@@ -22,9 +22,6 @@
 
 #include "Dragon.h"
 
-const unsigned int SCR_WIDTH = 1000;
-const unsigned int SCR_HEIGHT = 1000;
-
 enum MODE { POLYGON, CLIPPING };
 
 int main(void) {
@@ -166,6 +163,7 @@ int main(void) {
 
     {
         GLCall(glEnable(GL_DEPTH_TEST));
+        Drawing drawing(SCR_WIDTH, SCR_HEIGHT);
 
         float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
         // positions   // texCoords
@@ -211,10 +209,7 @@ int main(void) {
         {
             for (int j = 0; j < SCR_WIDTH; j++)
             {
-                renderTexture[i][j][0] = 128;
-                renderTexture[i][j][1] = 0;
-                renderTexture[i][j][2] = 0;
-                renderTexture[i][j][3] = 255;
+                drawing.DrawPixel(j, i, Color{ 255, 255, 255, 255 }, renderTexture);
             }
         }
         unsigned int slot = 0;
@@ -263,7 +258,7 @@ int main(void) {
         Polygon polygon, windowPolygon, currentPolygon;
         Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
         Sutherland sutherland;
-        //Drawing drawing(window);
+        
 
 
         bool clicked = false;
@@ -329,14 +324,11 @@ int main(void) {
             //drawing.DrawPolygon(polygon, polygonColor);
             //drawing.Fill(cutPolygon, cutPolygonColor);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++) // height
             {
-                for (int j = 0; j < 100; j++)
+                for (int j = 0; j < 300; j++) // width
                 {
-                    renderTexture[i][j][0] = polygonColor.r;
-                    renderTexture[i][j][1] = polygonColor.g;
-                    renderTexture[i][j][2] = polygonColor.b;
-                    renderTexture[i][j][3] = polygonColor.a;
+                    drawing.DrawPixel(j, i, windowPolygonColor, renderTexture);
                 }
             }
 
@@ -399,6 +391,9 @@ int main(void) {
                     //getting cursor position
                     glfwGetCursorPos(window, &xpos, &ypos);
                     std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
+
+                    ypos = SCR_HEIGHT - ypos;
+                    std::cout << "Texture Position at (" << xpos << " : " << ypos << std::endl;
 
                     if (mode == POLYGON) {
                         polygon.Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
