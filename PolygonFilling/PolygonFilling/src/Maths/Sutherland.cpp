@@ -43,6 +43,10 @@ Sutherland::Sutherland()
 
 Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 {
+	if (poly.PointCount() <= 2 || window.PointCount() <= 2) {
+		return Polygon();
+	}
+
 	int N1 = poly.PointCount();
 	int N3 = window.PointCount();
 	Vector F;

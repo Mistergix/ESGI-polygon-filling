@@ -66,12 +66,12 @@ void Drawing::DrawLine(Vector a, Vector b, Color c, GLubyte(*texture)[SCR_WIDTH]
 		if (dy >= 0) {
 			x = x1;
 			y = y1;
-			ye = x2;
+			ye = y2;
 		}
 		else {
 			x = x2;
 			y = y2;
-			ye = x1;
+			ye = y1;
 		}
 
 		DrawPixel(x, y, c, texture);
