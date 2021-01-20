@@ -275,30 +275,6 @@ int main(void) {
             int width, height;
             renderer.Resize(window, &width, &height);
 
-            float aspect = (float)width / (float)height;
-            float far = 100.f;
-            float near = 0.1f;
-            float orthographicSize = 1.f;
-
-            float* translation = objectTransform.GetTranslationMatrix();
-            float* rotationX = objectTransform.GetRotationMatrixX();
-            float* rotationY = objectTransform.GetRotationMatrixY();
-            float* rotationZ = objectTransform.GetRotationMatrixZ();
-            float* scale = objectTransform.GetScaleMatrix();
-            //float* projection = cam.GetOrthographicMatrix(orthographicSize, aspect, far, near);
-
-            float* projection = cam.GetPerspectiveMatrix(45.0f, near, far, aspect);
-
-            float ox = objectTransform.GetX();
-            float oy = objectTransform.GetY();
-            float oz = objectTransform.GetZ();
-
-            float cx = camTransform.GetX();
-            float cy = camTransform.GetY();
-            float cz = camTransform.GetZ();
-
-            
-
             renderer.Clear();
 
             ImGui_ImplOpenGL3_NewFrame();
@@ -306,17 +282,6 @@ int main(void) {
             ImGui::NewFrame();
 
             shader.Bind();
-            /*
-            shader.SetUniformMat4f("u_TranslationMatrix", translation);
-            shader.SetUniformMat4f("u_RotationXMatrix", rotationX);
-            shader.SetUniformMat4f("u_RotationYMatrix", rotationY);
-            shader.SetUniformMat4f("u_RotationZMatrix", rotationZ);
-            shader.SetUniformMat4f("u_ScaleMatrix", scale);
-
-            shader.SetUniform3f("u_CameraPosition", cx, cy, cz);
-            shader.SetUniform3f("u_TargetPosition", ox, oy, oz);
-
-            shader.SetUniformMat4f("u_ProjectionMatrix", projection);*/
 
             Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
 
