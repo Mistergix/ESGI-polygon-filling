@@ -1,25 +1,18 @@
-﻿#shader vertex
+#shader vertex
 #version 330 core
 
-layout(location = 0) in vec3 vertPos;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 uv;
+layout(location = 0) in vec3 position;
 
 uniform mat4 u_TranslationMatrix;
-uniform mat4 u_RotationMatrix;
+uniform mat4 u_RotationXMatrix;
+uniform mat4 u_RotationYMatrix;
+uniform mat4 u_RotationZMatrix;
 uniform mat4 u_ScaleMatrix;
 
 uniform mat4 u_ProjectionMatrix;
 
 uniform vec3 u_CameraPosition;
 uniform vec3 u_TargetPosition;
-
-varying vec3 v_VertPos;
-varying vec2 v_UV;
-varying vec3 v_Normal;
-varying vec3 v_CamPos;
-
-varying mat4 v_ModelMatrix;
 
 mat4 LookAtRH(vec3 camPos, vec3 target, vec3 up)
 {
@@ -55,91 +48,25 @@ mat4 LookAtRH(vec3 camPos, vec3 target, vec3 up)
     return (orientation * translation);
 }
 
-void main(void) {
-    // FRAGMENT DATA
-    v_VertPos = vertPos;
-    v_UV = uv;
-    v_Normal = normal;
-	v_ModelMatrix = u_TranslationMatrix * u_RotationMatrix * u_ScaleMatrix;
-    v_CamPos = u_CameraPosition;
-
-	// mat4 camModelMat = u_CameraTranslationMatrix * u_CameraRotationMatrix;
-
-	// mat4 viewMatrix = inverse(camModelMat);
-
+void main()
+{
+    mat4 rotationMatrixXYZ = u_RotationZMatrix * u_RotationYMatrix * u_RotationXMatrix;
+    mat4 modelMatrix = u_TranslationMatrix * rotationMatrixXYZ * u_ScaleMatrix;
     mat4 viewMatrix = LookAtRH(u_CameraPosition, u_TargetPosition, vec3(0.f, 1.f, 0.f));
 
-	vec4 worldPosition = v_ModelMatrix * vec4(vertPos, 1.0);
-	vec4 viewPosition = viewMatrix * worldPosition;
-	vec4 finalPosition = u_ProjectionMatrix * viewPosition;
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vec4 viewPosition = viewMatrix * worldPosition;
+    vec4 finalPosition = u_ProjectionMatrix * viewPosition;
 
-	gl_Position = finalPosition;
-}
-
-
+    gl_Position = finalPosition;
+};
 
 #shader fragment
 #version 330 core
 
-uniform sampler2D u_Texture;
-uniform float u_Shininess;
-uniform vec3 u_SpecularColor;
+out vec4 color;
 
-varying vec3 v_VertPos;
-varying vec2 v_UV;
-varying vec3 v_Normal;
-varying vec3 v_CamPos;
-
-varying mat4 v_ModelMatrix;
-
-uniform struct Light {
-    vec3 position;
-    vec3 intensities; //a.k.a the color of the light
-} light;
-
-vec4 diffuse(vec3 N, vec3 L) {
-    //calculate the cosine of the angle of incidence
-    float brightness = max(0.0, dot(N, L));
-
-    //calculate final color of the pixel, based on:
-    // 1. The angle of incidence: brightness
-    // 2. The color/intensities of the light: light.intensities
-    // 3. The texture and texture coord: texture(tex, fragTexCoord)
-    vec4 surfaceColor = texture(u_Texture, v_UV);
-
-    return vec4(brightness * light.intensities * surfaceColor.rgb, surfaceColor.a);
-}
-
-vec4 specular(vec3 N, vec3 L, vec3 V) {
-    
-    vec3 incidenceVector = -L;
-    vec3 reflectionVector = reflect(incidenceVector, N);
-
-    float cosAngle = max(0.0, dot(V, reflectionVector));
-    float specularCoefficient = pow(cosAngle, u_Shininess);
-
-    vec3 specularComponent = specularCoefficient * u_SpecularColor * light.intensities;
-
-    return vec4(specularComponent, 0.0);
-}
-
-void main(void)
+void main()
 {
-    //calculate normal in world coordinates
-    mat3 normalMatrix = transpose(inverse(mat3(v_ModelMatrix)));
-    vec3 normal = normalize(normalMatrix * v_Normal);
-
-    //calculate the location of this fragment (pixel) in world coordinates
-    vec3 surfacePos = vec3(v_ModelMatrix * vec4(v_VertPos, 1.0));
-
-    //calculate the vector from this pixels surface to the light source
-    vec3 surfaceToLight = normalize(light.position - surfacePos);
-
-    vec3 surfaceToCamera = normalize(v_CamPos - surfacePos);
-
-
-    vec4 dColor = diffuse(normal, surfaceToLight);
-    vec4 sColor = specular(normal, surfaceToLight, surfaceToCamera);
-
-    gl_FragColor = dColor + sColor;
-}
+	color = vec4(1.0);
+};

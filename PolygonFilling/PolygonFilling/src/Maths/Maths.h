@@ -1,5 +1,8 @@
 #pragma once
 #include "Vector.h"
+#include <math.h>
+
+#define PI 3.141592653589793f
 
 struct Mat2 {
 	float a, b;

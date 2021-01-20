@@ -22,6 +22,8 @@
     <ClCompile Include="src\Drawing\Drawing.cpp" />
     <ClCompile Include="src\Maths\Maths.cpp" />
     <ClCompile Include="src\Maths\Vector.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Dragon.h" />
@@ -329,6 +331,8 @@
     <ClInclude Include="src\Drawing\Drawing.h" />
     <ClInclude Include="src\Maths\Maths.h" />
     <ClInclude Include="src\Maths\Vector.h" />
+    <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl" />
@@ -467,5 +471,6 @@
     <None Include="src\vendor\glm\gtx\vector_angle.inl" />
     <None Include="src\vendor\glm\gtx\vector_query.inl" />
     <None Include="src\vendor\glm\gtx\wrap.inl" />
+    <None Include="res\shaders\Transform.shader" />
   </ItemGroup>
 </Project>

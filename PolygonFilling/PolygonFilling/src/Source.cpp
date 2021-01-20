@@ -17,7 +17,13 @@
 #include "Maths/Sutherland.h"
 #include "Drawing/Drawing.h"
 
-#define PI 3.141592653589793f
+#include "Transform.h"
+#include "Camera.h"
+
+#include "Dragon.h"
+
+const unsigned int SCR_WIDTH = 1000;
+const unsigned int SCR_HEIGHT = 1000;
 
 enum MODE { POLYGON, CLIPPING };
 
@@ -140,7 +146,7 @@ int main(void) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create a windowed mode window and its OpenGL context 
-    window = glfwCreateWindow(1000, 1000, "Clipping and Windowing", NULL, NULL);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Clipping and Windowing", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -158,12 +164,21 @@ int main(void) {
     }
 
     {
-        const float vertices[] = {
-            0.0f, 0.0f
+        GLCall(glEnable(GL_DEPTH_TEST));
+
+        float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
         };
 
         const unsigned int indices[] = {
-            0
+            0, 1, 2, 3, 4, 5
         };
 
         // BLENDING
@@ -177,19 +192,52 @@ int main(void) {
 
         // VERTEX BUFFER
 
-        VertexBuffer vb(vertices, sizeof(vertices));
+        VertexBuffer vb(quadVertices, sizeof(quadVertices));
 
         VertexBufferLayout layout;
+        layout.Push<float>(2);
         layout.Push<float>(2);
 
         va.AddBuffer(vb, layout);
 
         // INDEX BUFFER
-        IndexBuffer ib(indices, 1);
+        IndexBuffer ib(indices, 6);
+
+        // RENDER TEXTURE
+        unsigned int renderTextureId;
+        static GLubyte renderTexture[SCR_HEIGHT][SCR_WIDTH][4];
+        for (int i = 0; i < SCR_HEIGHT; i++)
+        {
+            for (int j = 0; j < SCR_WIDTH; j++)
+            {
+                renderTexture[i][j][0] = 128;
+                renderTexture[i][j][1] = 0;
+                renderTexture[i][j][2] = 0;
+                renderTexture[i][j][3] = 255;
+            }
+        }
+        unsigned int slot = 0;
+        GLCall(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+        GLCall(glGenTextures(1, &renderTextureId));
+        GLCall(glActiveTexture(GL_TEXTURE0 + slot))
+        GLCall(glBindTexture(GL_TEXTURE_2D, renderTextureId));
+
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+
+        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
+        
 
         // SHADER
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
+
+        
+
+        // draw as wireframe
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         // UNBIND
         va.Unbind();
@@ -222,10 +270,38 @@ int main(void) {
 
         bool show_colors = false;
 
+        Transform camTransform, objectTransform;
+        Camera cam;
+        camTransform.SetPos(0.0f, 0.0f, -10.0f);
+
         while (!glfwWindowShouldClose(window))
         {
             int width, height;
             renderer.Resize(window, &width, &height);
+
+            float aspect = (float)width / (float)height;
+            float far = 100.f;
+            float near = 0.1f;
+            float orthographicSize = 1.f;
+
+            float* translation = objectTransform.GetTranslationMatrix();
+            float* rotationX = objectTransform.GetRotationMatrixX();
+            float* rotationY = objectTransform.GetRotationMatrixY();
+            float* rotationZ = objectTransform.GetRotationMatrixZ();
+            float* scale = objectTransform.GetScaleMatrix();
+            //float* projection = cam.GetOrthographicMatrix(orthographicSize, aspect, far, near);
+
+            float* projection = cam.GetPerspectiveMatrix(45.0f, near, far, aspect);
+
+            float ox = objectTransform.GetX();
+            float oy = objectTransform.GetY();
+            float oz = objectTransform.GetZ();
+
+            float cx = camTransform.GetX();
+            float cy = camTransform.GetY();
+            float cz = camTransform.GetZ();
+
+            
 
             renderer.Clear();
 
@@ -234,12 +310,40 @@ int main(void) {
             ImGui::NewFrame();
 
             shader.Bind();
+            /*
+            shader.SetUniformMat4f("u_TranslationMatrix", translation);
+            shader.SetUniformMat4f("u_RotationXMatrix", rotationX);
+            shader.SetUniformMat4f("u_RotationYMatrix", rotationY);
+            shader.SetUniformMat4f("u_RotationZMatrix", rotationZ);
+            shader.SetUniformMat4f("u_ScaleMatrix", scale);
+
+            shader.SetUniform3f("u_CameraPosition", cx, cy, cz);
+            shader.SetUniform3f("u_TargetPosition", ox, oy, oz);
+
+            shader.SetUniformMat4f("u_ProjectionMatrix", projection);*/
 
             Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
 
             //drawing.DrawPolygon(windowPolygon, windowPolygonColor);
             //drawing.DrawPolygon(polygon, polygonColor);
             //drawing.Fill(cutPolygon, cutPolygonColor);
+
+            for (int i = 0; i < 100; i++)
+            {
+                for (int j = 0; j < 100; j++)
+                {
+                    renderTexture[i][j][0] = polygonColor.r;
+                    renderTexture[i][j][1] = polygonColor.g;
+                    renderTexture[i][j][2] = polygonColor.b;
+                    renderTexture[i][j][3] = polygonColor.a;
+                }
+            }
+
+            
+            
+            GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
+            shader.SetUniform1i("u_Texture", slot);
+            
 
             renderer.Draw(va, ib, shader);
 
@@ -268,9 +372,9 @@ int main(void) {
 
                 if (show_colors) {
                     ImGui::Begin("Colors");
-                    ImGui::ColorEdit4("Polygon Color", &polygonColor.r);
-                    ImGui::ColorEdit4("Window Polygon Color", &windowPolygonColor.r);
-                    ImGui::ColorEdit4("Cut Polygon Color", &cutPolygonColor.r);
+                    ImGui::ColorEdit3("Polygon Color", &polygonColor.r);
+                    ImGui::ColorEdit3("Window Polygon Color", &windowPolygonColor.r);
+                    ImGui::ColorEdit3("Cut Polygon Color", &cutPolygonColor.r);
                     ImGui::End();
                 }
             }
@@ -317,4 +421,4 @@ int main(void) {
 
     glfwTerminate();
     return 0;
-}
+   }
