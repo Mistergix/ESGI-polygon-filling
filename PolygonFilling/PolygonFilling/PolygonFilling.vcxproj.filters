@@ -16,8 +16,13 @@
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="src\VertexArray.cpp" />
     <ClCompile Include="src\VertexBuffer.cpp" />
-    <ClCompile Include="src\Maths\Point.cpp" />
     <ClCompile Include="src\Maths\Polygon.cpp" />
+    <ClCompile Include="src\Maths\Sutherland.cpp" />
+    <ClCompile Include="src\Drawing\Drawing.cpp" />
+    <ClCompile Include="src\Maths\Maths.cpp" />
+    <ClCompile Include="src\Maths\Vector.cpp" />
+    <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Dragon.h" />
@@ -319,8 +324,13 @@
     <ClInclude Include="src\VertexArray.h" />
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexBufferLayout.h" />
-    <ClInclude Include="src\Maths\Point.h" />
     <ClInclude Include="src\Maths\Polygon.h" />
+    <ClInclude Include="src\Maths\Sutherland.h" />
+    <ClInclude Include="src\Drawing\Drawing.h" />
+    <ClInclude Include="src\Maths\Maths.h" />
+    <ClInclude Include="src\Maths\Vector.h" />
+    <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl" />
@@ -459,6 +469,7 @@
     <None Include="src\vendor\glm\gtx\vector_angle.inl" />
     <None Include="src\vendor\glm\gtx\vector_query.inl" />
     <None Include="src\vendor\glm\gtx\wrap.inl" />
+    <None Include="res\shaders\Transform.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\pixelTex.png" />
