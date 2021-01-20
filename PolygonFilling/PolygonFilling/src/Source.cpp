@@ -61,13 +61,13 @@ int main(void) {
     ASSERT(inter1);
     ASSERT(inter2);
     ASSERT(inter3);
-    ASSERT(! inter4);
-    ASSERT(! inter5);
-    ASSERT(! inter6);
-    ASSERT(! inter7);
+    ASSERT(!inter4);
+    ASSERT(!inter5);
+    ASSERT(!inter6);
+    ASSERT(!inter7);
     ASSERT(inter8);
     ASSERT(inter9);
-    ASSERT(! inter10);
+    ASSERT(!inter10);
     ASSERT(inter11);
 
 
@@ -115,7 +115,7 @@ int main(void) {
     bool visible9 = s.Visible(Vector(2.0f, 2.0f), Vector(-1.0f, 1.25f), Vector(-1.0f, 0.5f), clipPolygon); // VISIBLE
     bool visible10 = s.Visible(Vector(2.0f, 2.0f), Vector(-1.0f, 0.5f), Vector(2.0f, 0.5f), clipPolygon); // VISIBLE
 
-    ASSERT(! visible1);
+    ASSERT(!visible1);
     ASSERT(visible2);
 
     ASSERT(visible3);
@@ -124,7 +124,7 @@ int main(void) {
     ASSERT(visible6);
 
     ASSERT(visible7);
-    ASSERT(! visible8);
+    ASSERT(!visible8);
     ASSERT(visible9);
     ASSERT(visible10);
 
@@ -216,7 +216,7 @@ int main(void) {
         GLCall(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         GLCall(glGenTextures(1, &renderTextureId));
         GLCall(glActiveTexture(GL_TEXTURE0 + slot))
-        GLCall(glBindTexture(GL_TEXTURE_2D, renderTextureId));
+            GLCall(glBindTexture(GL_TEXTURE_2D, renderTextureId));
 
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
@@ -224,13 +224,13 @@ int main(void) {
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
         GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
-        
+
 
         // SHADER
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
 
-        
+
 
         // draw as wireframe
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -258,7 +258,7 @@ int main(void) {
         Polygon polygon, windowPolygon;
         Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
         Sutherland sutherland;
-        
+
         polygon.SetTrigonometric(true);
         windowPolygon.SetTrigonometric(true);
 
@@ -296,14 +296,12 @@ int main(void) {
             drawing.DrawPolygon(polygon, polygonColor, renderTexture);
             drawing.DrawPolygon(windowPolygon, windowPolygonColor, renderTexture);
             drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
-            
-            
-            
+
+
             GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
             shader.SetUniform1i("u_Texture", slot);
-            
-
             renderer.Draw(va, ib, shader);
+
 
             {
                 ImGui::Begin("Polygon clipping and filling", &my_tool_active, ImGuiWindowFlags_MenuBar);
@@ -311,75 +309,94 @@ int main(void) {
                 {
                     if (ImGui::BeginMenu("Menu"))
                     {
-                        if (ImGui::MenuItem("Colors", "")) { 
-                            show_colors = !show_colors;  
+                        if (ImGui::MenuItem("Colors", "")) {
+                            show_colors = !show_colors;
                         }
-                        if (ImGui::MenuItem("Polygon to cut", "")) { 
-                            mode = POLYGON; 
-                            std::cout << "The mode is " << mode << std::endl; 
+                        if (ImGui::MenuItem("Polygon to cut", "")) {
+                            mode = POLYGON;
+                            std::cout << "The mode is " << mode << std::endl;
                         }
-                        if (ImGui::MenuItem("Draw window", "")) { 
-                            mode = CLIPPING;  
+                        if (ImGui::MenuItem("Draw window", "")) {
+                            mode = CLIPPING;
                             std::cout << "The mode is " << mode << std::endl;
                         }
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenuBar();
-                }
-                ImGui::End();
 
-                if (show_colors) {
-                    ImGui::Begin("Colors");
-                    ImGui::SliderInt3("Polygon Color", &polygonColor.r, 0, 255);
-                    ImGui::SliderInt3("Window Polygon Color", &windowPolygonColor.r, 0, 255);
-                    ImGui::SliderInt3("Cut Polygon Color", &cutPolygonColor.r, 0, 255);
+                    if (ImGui::BeginMenuBar())
+                    {
+                        if (ImGui::BeginMenu("Clear"))
+                        {
+                            if (ImGui::MenuItem("All", "")) {
+                                windowPolygon.Clear();
+                                polygon.Clear();
+                            }
+                            if (ImGui::MenuItem("Polygon to cut", "")) {
+                                polygon.Clear();
+                            }
+                            if (ImGui::MenuItem("Draw window", "")) {
+                                windowPolygon.Clear();
+                            }
+                            ImGui::EndMenu();
+                        }
+                        ImGui::EndMenuBar();
+                    }
                     ImGui::End();
-                }
-            }
 
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-            //Swap front and back buffers 
-            glfwSwapBuffers(window);
-
-            //Poll for and process events
-            glfwPollEvents();
-
-            int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
-            if (state == GLFW_PRESS)
-            {
-                if (!clicked) {
-                    clicked = true;
-                    double xpos, ypos;
-                    //getting cursor position
-                    glfwGetCursorPos(window, &xpos, &ypos);
-                    std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
-
-                    ypos = SCR_HEIGHT - ypos;
-                    std::cout << "Texture Position at (" << xpos << " : " << ypos << std::endl;
-
-                    if (mode == POLYGON) {
-                        polygon.Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
-                        std::cout << polygon.PointCount() << std::endl;
-                    }
-                    else if (mode == CLIPPING) {
-                        windowPolygon.Add(Vector(xpos + 0.5f, ypos + 0.5f));
-                        std::cout << windowPolygon.PointCount() << std::endl;
+                    if (show_colors) {
+                        ImGui::Begin("Colors");
+                        ImGui::SliderInt3("Polygon Color", &polygonColor.r, 0, 255);
+                        ImGui::SliderInt3("Window Polygon Color", &windowPolygonColor.r, 0, 255);
+                        ImGui::SliderInt3("Cut Polygon Color", &cutPolygonColor.r, 0, 255);
+                        ImGui::End();
                     }
                 }
-            }
-            else {
-                clicked = false;
+
+
+                ImGui::Render();
+                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+                //Swap front and back buffers 
+                glfwSwapBuffers(window);
+
+                //Poll for and process events
+                glfwPollEvents();
+
+                int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+                if (state == GLFW_PRESS)
+                {
+                    if (!clicked) {
+                        clicked = true;
+                        double xpos, ypos;
+                        //getting cursor position
+                        glfwGetCursorPos(window, &xpos, &ypos);
+                        std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
+
+                        ypos = SCR_HEIGHT - ypos;
+                        std::cout << "Texture Position at (" << xpos << " : " << ypos << std::endl;
+
+                        if (mode == POLYGON) {
+                            polygon.Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
+                            std::cout << polygon.PointCount() << std::endl;
+                        }
+                        else if (mode == CLIPPING) {
+                            windowPolygon.Add(Vector(xpos + 0.5f, ypos + 0.5f));
+                            std::cout << windowPolygon.PointCount() << std::endl;
+                        }
+                    }
+                }
+                else {
+                    clicked = false;
+                }
             }
         }
+
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+
+        glfwTerminate();
+        return 0;
     }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    glfwTerminate();
-    return 0;
-   }
+}
