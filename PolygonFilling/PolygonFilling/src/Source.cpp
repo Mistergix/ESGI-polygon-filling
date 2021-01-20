@@ -260,7 +260,7 @@ int main(void) {
 
         bool my_tool_active = true;
         Polygon polygon, windowPolygon, currentPolygon;
-        Color polygonColor{ 255.0f, 0.0f, 0.0f, 255.0f }, windowPolygonColor{ 0.0f, 255.0f, 0.0f, 255.0f }, cutPolygonColor{ 0.0f, 0.0f, 255.0f, 255.0f };
+        Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
         Sutherland sutherland;
         //Drawing drawing(window);
 
@@ -372,9 +372,9 @@ int main(void) {
 
                 if (show_colors) {
                     ImGui::Begin("Colors");
-                    ImGui::ColorEdit3("Polygon Color", &polygonColor.r);
-                    ImGui::ColorEdit3("Window Polygon Color", &windowPolygonColor.r);
-                    ImGui::ColorEdit3("Cut Polygon Color", &cutPolygonColor.r);
+                    ImGui::SliderInt3("Polygon Color", &polygonColor.r, 0, 255);
+                    ImGui::SliderInt3("Window Polygon Color", &windowPolygonColor.r, 0, 255);
+                    ImGui::SliderInt3("Cut Polygon Color", &cutPolygonColor.r, 0, 255);
                     ImGui::End();
                 }
             }
