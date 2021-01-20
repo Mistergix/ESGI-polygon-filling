@@ -52,7 +52,7 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 	Vector F;
 	Vector S;
 	Polygon PL = poly;
-	for (int i = 0; i < N3 - 1; i++)
+	for (int i = 0; i < N3; i++)
 	{
 		int N2 = 0;
 		Polygon PS = Polygon();
@@ -63,21 +63,21 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 			}
 			else
 			{
-				if (Cut(S , PL.GetPoint(j), window.GetPoint(i), window.GetPoint(i+1))) {
-					Vector I = Intersection(S, PL.GetPoint(j), window.GetPoint(i), window.GetPoint(i + 1));
+				if (Cut(S , PL.GetPoint(j), window.GetPoint(i), window.GetPoint((i + 1) % N3))) {
+					Vector I = Intersection(S, PL.GetPoint(j), window.GetPoint(i), window.GetPoint((i + 1) % N3));
 					PS.Add(I);
 					N2++;
 				}
 			}
 			S = PL.GetPoint(j);
-			if (Visible(S, window.GetPoint(i), window.GetPoint(i + 1), window)) {
+			if (Visible(S, window.GetPoint(i), window.GetPoint((i + 1) % N3), window)) {
 				PS.Add(S);
 				N2++;
 			}
 		}
 		if (N2 > 0) {
-			if (Cut(S, F, window.GetPoint(i), window.GetPoint(i + 1))) {
-				Vector I = Intersection(S, F, window.GetPoint(i), window.GetPoint(i + 1));
+			if (Cut(S, F, window.GetPoint(i), window.GetPoint((i + 1) % N3))) {
+				Vector I = Intersection(S, F, window.GetPoint(i), window.GetPoint((i + 1) % N3));
 				PS.Add(I);
 				N2++;
 			}

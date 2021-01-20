@@ -164,118 +164,48 @@ int main(void) {
     GLCall(glEnable(GL_DEPTH_TEST));
     Drawing drawing(SCR_WIDTH, SCR_HEIGHT);
 
-    float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-    // positions   // texCoords
-    -1.0f,  1.0f,  0.0f, 1.0f,
-    -1.0f, -1.0f,  0.0f, 0.0f,
-        1.0f, -1.0f,  1.0f, 0.0f,
-
-    -1.0f,  1.0f,  0.0f, 1.0f,
-        1.0f, -1.0f,  1.0f, 0.0f,
-        1.0f,  1.0f,  1.0f, 1.0f
-    };
-
-    const unsigned int indices[] = {
-        0, 1, 2, 3, 4, 5
-    };
-
-    // BLENDING
-
-    GLCall(glEnable(GL_BLEND));
-    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-    // VERTEX ARRAY
-
-    VertexArray va;
-
-    // VERTEX BUFFER
-
-    VertexBuffer vb(quadVertices, sizeof(quadVertices));
-
-    VertexBufferLayout layout;
-    layout.Push<float>(2);
-    layout.Push<float>(2);
-
-    va.AddBuffer(vb, layout);
-
-    // INDEX BUFFER
-    IndexBuffer ib(indices, 6);
-
-    // RENDER TEXTURE
-    unsigned int renderTextureId;
-    static GLubyte renderTexture[SCR_HEIGHT][SCR_WIDTH][4];
-    for (int i = 0; i < SCR_HEIGHT; i++)
     {
-        for (int j = 0; j < SCR_WIDTH; j++)
-        {
-            drawing.DrawPixel(j, i, Color{ 255, 255, 255, 255 }, renderTexture);
-        }
-    }
-    unsigned int slot = 0;
-    GLCall(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-    GLCall(glGenTextures(1, &renderTextureId));
-    GLCall(glActiveTexture(GL_TEXTURE0 + slot))
-    GLCall(glBindTexture(GL_TEXTURE_2D, renderTextureId));
 
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
 
-    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
+        -1.0f,  1.0f,  0.0f, 1.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
+            1.0f,  1.0f,  1.0f, 1.0f
+        };
 
+        const unsigned int indices[] = {
+            0, 1, 2, 3, 4, 5
+        };
 
-    // SHADER
-    Shader shader("res/shaders/Basic.shader");
-    shader.Bind();
+        // BLENDING
 
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+        // VERTEX ARRAY
 
-    // draw as wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        VertexArray va;
 
-    // UNBIND
-    va.Unbind();
-    shader.Unbind();
-    vb.Unbind();
-    ib.Unbind();
+        // VERTEX BUFFER
 
-    Renderer renderer;
+        VertexBuffer vb(quadVertices, sizeof(quadVertices));
 
-    // IMGUI
+        VertexBufferLayout layout;
+        layout.Push<float>(2);
+        layout.Push<float>(2);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+        va.AddBuffer(vb, layout);
 
-    ImGui::StyleColorsDark();
+        // INDEX BUFFER
+        IndexBuffer ib(indices, 6);
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-
-    bool my_tool_active = true;
-    Polygon polygon, windowPolygon;
-    Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
-    Sutherland sutherland;
-
-    polygon.SetTrigonometric(true);
-    windowPolygon.SetTrigonometric(true);
-
-    bool clicked = false;
-    MODE mode = POLYGON;
-
-    bool show_colors = false;
-    bool showPoints = false;
-
-    Transform camTransform, objectTransform;
-    Camera cam;
-    camTransform.SetPos(0.0f, 0.0f, -10.0f);
-
-    while (!glfwWindowShouldClose(window))
-    {
-        int width, height;
-        renderer.Resize(window, &width, &height);
-
-        renderer.Clear();
+        // RENDER TEXTURE
+        unsigned int renderTextureId;
+        static GLubyte renderTexture[SCR_HEIGHT][SCR_WIDTH][4];
         for (int i = 0; i < SCR_HEIGHT; i++)
         {
             for (int j = 0; j < SCR_WIDTH; j++)
@@ -283,27 +213,99 @@ int main(void) {
                 drawing.DrawPixel(j, i, Color{ 255, 255, 255, 255 }, renderTexture);
             }
         }
+        unsigned int slot = 0;
+        GLCall(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+        GLCall(glGenTextures(1, &renderTextureId));
+        GLCall(glActiveTexture(GL_TEXTURE0 + slot))
+            GLCall(glBindTexture(GL_TEXTURE_2D, renderTextureId));
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
+        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
+
+
+        // SHADER
+        Shader shader("res/shaders/Basic.shader");
         shader.Bind();
 
-        Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
-
-        drawing.DrawPolygon(polygon, polygonColor, renderTexture);
-        drawing.DrawPolygon(windowPolygon, windowPolygonColor, renderTexture);
-        drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
-        drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
 
 
-        GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
-        shader.SetUniform1i("u_Texture", slot);
-        renderer.Draw(va, ib, shader);
+        // draw as wireframe
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        // UNBIND
+        va.Unbind();
+        shader.Unbind();
+        vb.Unbind();
+        ib.Unbind();
+
+        Renderer renderer;
+
+        // IMGUI
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init(glsl_version);
+
+        bool my_tool_active = true;
+        Polygon polygon, windowPolygon;
+        Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
+        Sutherland sutherland;
+
+        polygon.SetTrigonometric(true);
+        windowPolygon.SetTrigonometric(true);
+
+        bool clicked = false;
+        MODE mode = POLYGON;
+
+        bool show_colors = false;
+        bool showPoints = false;
+
+        Transform camTransform, objectTransform;
+        Camera cam;
+        camTransform.SetPos(0.0f, 0.0f, -10.0f);
+
+        while (!glfwWindowShouldClose(window))
+        {
+            int width, height;
+            renderer.Resize(window, &width, &height);
+
+            renderer.Clear();
+            for (int i = 0; i < SCR_HEIGHT; i++)
+            {
+                for (int j = 0; j < SCR_WIDTH; j++)
+                {
+                    drawing.DrawPixel(j, i, Color{ 255, 255, 255, 255 }, renderTexture);
+                }
+            }
+
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            shader.Bind();
+
+            Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
+
+            drawing.DrawPolygon(polygon, polygonColor, renderTexture);
+            drawing.DrawPolygon(windowPolygon, windowPolygonColor, renderTexture);
+            drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
+            drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
 
 
-            
+            GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
+            shader.SetUniform1i("u_Texture", slot);
+            renderer.Draw(va, ib, shader);
+
+
+
             ImGui::Begin("Polygon clipping and filling", &my_tool_active, ImGuiWindowFlags_MenuBar);
 
             if (ImGui::BeginMenuBar())
@@ -360,7 +362,7 @@ int main(void) {
             if (mode == POLYGON) {
                 ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected polygon is polygon");
             }
-            else if(mode == CLIPPING) {
+            else if (mode == CLIPPING) {
                 ImGui::TextColored(ImVec4(1, 1, 0, 1), "Selected polygon is window");
             }
             ImGui::End();
@@ -438,12 +440,13 @@ int main(void) {
             else {
                 clicked = false;
             }
-            
-    }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+        }
+
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
 
     glfwTerminate();
     return 0;
