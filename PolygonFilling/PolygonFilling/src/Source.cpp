@@ -288,14 +288,14 @@ int main(void) {
             //drawing.DrawPolygon(windowPolygon, windowPolygonColor);
             //drawing.DrawPolygon(polygon, polygonColor);
             //drawing.Fill(cutPolygon, cutPolygonColor);
-
+            /*
             for (int i = 0; i < 100; i++) // height
             {
                 for (int j = 0; j < 300; j++) // width
                 {
                     drawing.DrawPixel(j, i, windowPolygonColor, renderTexture);
                 }
-            }
+            }*/
 
             
             
