@@ -1,7 +1,8 @@
 #include "Drawing.h"
+#include <map>
 
 struct LCA {
-	int ymax, xmin;
+	int xmin, ymax;
 	float coeff;
 };
 
@@ -118,22 +119,80 @@ void Drawing::DrawPolygon(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 //LCA
 void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 {
-	std::vector<LCA> lca;
-	
+	std::map<int,LCA> coord;
+
+	int MIN_Y = 1000;
+	int MAX_Y = 0;
+
+	//creation du SI
 	for (int i = 0; i < p.PointCount() - 1; i++) 
 	{
 		Vector a = p.GetPoint(i);
 		Vector b = p.GetPoint(i + 1);
 		int ymax = (a.getY() < b.getY() ? b.getY() : a.getY());
-		int xmin = (a.getX() < b.getX() ? a.getX() : b.getX());
-		
-		float coeff = (b.getY() - a.getY())/(b.getX() - a.getX());
-		coeff = 1 / coeff;
-		LCA tmp;
-		tmp.ymax = ymax;
-		tmp.xmin = xmin;
-		tmp.coeff = coeff;
+		int ymin = (a.getY() > b.getY() ? b.getY() : a.getY());
+		int xmin;
 
-		lca.push_back(tmp);
+		if (a.getY() == ymin) {
+			xmin = a.getX();
+		}
+		else {
+			xmin = b.getX();
+		}
+
+		if (ymax > MAX_Y) MAX_Y = ymax;
+		if (ymin < MIN_Y) MIN_Y = ymin;
+
+		float coeff = (a.getY() - b.getY() / a.getX() - b.getX());
+		
+		LCA lca;
+		lca.xmin = xmin;
+		lca.ymax = ymax;
+		lca.coeff = 1 / coeff;
+		coord.insert({ ymin, lca });
+
+	}
+
+	//tri
+	/*for (int i = 0; i < coord.size()-1; i++) {
+		CHEH tmp;
+		for(int j = 1; j < coord.size(); j++)
+		{
+			if (coord.at(i).ymin > coord.at(j).ymin) 
+			{
+				tmp = coord.at(i);
+				coord.at(i) = coord.at(j);
+				coord.at(j) = tmp;
+			}
+		}
+	}
+	*/
+
+	LCA current = coord.at(MIN_Y);
+
+	//liste triée, application LCA
+	for (int y = MIN_Y+1; y < MAX_Y; y++) {
+		int x1, x2;
+		
+		if (coord.find(y) == coord.end())//pas trouvé
+		{
+			x1 = current.xmin + current.coeff;
+		}
+
+		else { //trouvé
+			current = coord.at(y);
+			x1 = current.xmin;
+		}
+
+		for (int i = y; i < MAX_Y; i++) {
+			if (coord.find(i) == coord.end()) {
+				break;
+			}
+			else {
+				x2 = coord.at(i).xmin + coord.at(i).coeff;
+			}
+		}
+
+		DrawLine({ x1, y }, { x2, y }, c, texture);
 	}
 }
