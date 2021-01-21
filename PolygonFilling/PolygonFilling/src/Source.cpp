@@ -309,10 +309,6 @@ int main(void) {
                 drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
             }
 
-            
-            
-
-
             GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
             shader.SetUniform1i("u_Texture", slot);
             renderer.Draw(va, ib, shader);

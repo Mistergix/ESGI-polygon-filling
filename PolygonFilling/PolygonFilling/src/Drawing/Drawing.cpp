@@ -193,6 +193,6 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 			}
 		}
 
-		DrawLine({ x1, y }, { x2, y }, c, texture);
+		DrawLine({ (float)x1, (float)y }, { (float)x2, (float)y }, c, texture);
 	}
 }
