@@ -20,8 +20,6 @@
 #include "Transform.h"
 #include "Camera.h"
 
-#include "Dragon.h"
-
 enum MODE { POLYGON, CLIPPING };
 
 int main(void) {
@@ -216,8 +214,8 @@ int main(void) {
         unsigned int slot = 0;
         GLCall(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         GLCall(glGenTextures(1, &renderTextureId));
-        GLCall(glActiveTexture(GL_TEXTURE0 + slot))
-            GLCall(glBindTexture(GL_TEXTURE_2D, renderTextureId));
+        GLCall(glActiveTexture(GL_TEXTURE0 + slot));
+        GLCall(glBindTexture(GL_TEXTURE_2D, renderTextureId));
 
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
