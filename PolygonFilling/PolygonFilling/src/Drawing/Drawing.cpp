@@ -1,5 +1,10 @@
 #include "Drawing.h"
 
+struct LCA {
+	int ymax, xmin;
+	float coeff;
+};
+
 Drawing::Drawing(int w, int h)
 {
 	m_width = w;
@@ -110,7 +115,25 @@ void Drawing::DrawPolygon(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 	}
 }
 
+//LCA
 void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 {
+	std::vector<LCA> lca;
+	
+	for (int i = 0; i < p.PointCount() - 1; i++) 
+	{
+		Vector a = p.GetPoint(i);
+		Vector b = p.GetPoint(i + 1);
+		int ymax = (a.getY() < b.getY() ? b.getY() : a.getY());
+		int xmin = (a.getX() < b.getX() ? a.getX() : b.getX());
+		
+		float coeff = (b.getY() - a.getY())/(b.getX() - a.getX());
+		coeff = 1 / coeff;
+		LCA tmp;
+		tmp.ymax = ymax;
+		tmp.xmin = xmin;
+		tmp.coeff = coeff;
 
+		lca.push_back(tmp);
+	}
 }
