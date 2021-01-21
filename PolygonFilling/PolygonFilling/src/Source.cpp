@@ -253,22 +253,25 @@ int main(void) {
         ImGui_ImplOpenGL3_Init(glsl_version);
 
         bool my_tool_active = true;
-        Polygon polygon, windowPolygon;
+        Polygon  windowPolygon;
         Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
         Sutherland sutherland;
 
-        polygon.SetTrigonometric(true);
         windowPolygon.SetTrigonometric(true);
 
         bool clicked = false;
         MODE mode = POLYGON;
 
         bool show_colors = false;
-        bool showPoints = false;
 
         Transform camTransform, objectTransform;
         Camera cam;
         camTransform.SetPos(0.0f, 0.0f, -10.0f);
+
+        std::vector<Polygon> drawnPolygons;
+
+        drawnPolygons.push_back(Polygon());
+        drawnPolygons[0].SetTrigonometric(true);
 
         while (!glfwWindowShouldClose(window))
         {
@@ -290,12 +293,24 @@ int main(void) {
 
             shader.Bind();
 
-            Polygon cutPolygon = sutherland.Clip(polygon, windowPolygon);
+            for (int i = 0; i < drawnPolygons.size(); i++)
+            {
+                drawing.DrawPolygon(drawnPolygons[i], polygonColor, renderTexture);
+            }
 
-            drawing.DrawPolygon(polygon, polygonColor, renderTexture);
             drawing.DrawPolygon(windowPolygon, windowPolygonColor, renderTexture);
-            drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
-            drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
+
+
+            for (int i = 0; i < drawnPolygons.size(); i++)
+            {
+                Polygon cutPolygon = sutherland.Clip(drawnPolygons[i], windowPolygon);
+               
+                drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
+                drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
+            }
+
+            
+            
 
 
             GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
@@ -313,8 +328,18 @@ int main(void) {
                     if (ImGui::MenuItem("Show Colors", "")) {
                         show_colors = !show_colors;
                     }
-                    if (ImGui::MenuItem("Show Points", "")) {
-                        showPoints = !showPoints;
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
+
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("Add Polygon"))
+                {
+                    if (ImGui::MenuItem("Add subject polygon", "")) {
+                        drawnPolygons.push_back(Polygon());
+                        drawnPolygons[drawnPolygons.size() - 1].SetTrigonometric(true);
                     }
                     ImGui::EndMenu();
                 }
@@ -344,10 +369,14 @@ int main(void) {
                 {
                     if (ImGui::MenuItem("All", "")) {
                         windowPolygon.Clear();
-                        polygon.Clear();
+                        drawnPolygons.clear();
+                        drawnPolygons.push_back(Polygon());
+                        drawnPolygons[drawnPolygons.size() - 1].SetTrigonometric(true);
                     }
-                    if (ImGui::MenuItem("Polygon to cut", "")) {
-                        polygon.Clear();
+                    if (ImGui::MenuItem("Polygons to cut", "")) {
+                        drawnPolygons.clear();
+                        drawnPolygons.push_back(Polygon());
+                        drawnPolygons[drawnPolygons.size() - 1].SetTrigonometric(true);
                     }
                     if (ImGui::MenuItem("Draw window", "")) {
                         windowPolygon.Clear();
@@ -370,35 +399,6 @@ int main(void) {
                 ImGui::SliderInt3("Polygon Color", &polygonColor.r, 0, 255);
                 ImGui::SliderInt3("Window Polygon Color", &windowPolygonColor.r, 0, 255);
                 ImGui::SliderInt3("Cut Polygon Color", &cutPolygonColor.r, 0, 255);
-                ImGui::End();
-            }
-
-            if (showPoints) {
-                ImGui::Begin("Polygon Points");
-                ImGui::BeginChild("Scrolling");
-                for (int n = 0; n < polygon.PointCount(); n++) {
-                    Vector point = polygon.GetPoint(n);
-                    ImGui::Text("Point %04d: (%f, %f)", n + 1, point.getX(), point.getY());
-                }
-                ImGui::EndChild();
-                ImGui::End();
-
-                ImGui::Begin("Window Points");
-                ImGui::BeginChild("Scrolling");
-                for (int n = 0; n < windowPolygon.PointCount(); n++) {
-                    Vector point = windowPolygon.GetPoint(n);
-                    ImGui::Text("Point %04d: (%f, %f)", n + 1, point.getX(), point.getY());
-                }
-                ImGui::EndChild();
-                ImGui::End();
-
-                ImGui::Begin("Cut Points");
-                ImGui::BeginChild("Scrolling");
-                for (int n = 0; n < cutPolygon.PointCount(); n++) {
-                    Vector point = cutPolygon.GetPoint(n);
-                    ImGui::Text("Point %04d: (%f, %f)", n + 1, point.getX(), point.getY());
-                }
-                ImGui::EndChild();
                 ImGui::End();
             }
 
@@ -426,8 +426,8 @@ int main(void) {
                     std::cout << "Texture Position at (" << xpos << " : " << ypos << std::endl;
 
                     if (mode == POLYGON) {
-                        polygon.Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
-                        std::cout << polygon.PointCount() << std::endl;
+                        drawnPolygons[drawnPolygons.size() - 1].Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
+                        std::cout << drawnPolygons[drawnPolygons.size() - 1].PointCount() << std::endl;
                     }
                     else if (mode == CLIPPING) {
                         windowPolygon.Add(Vector(xpos + 0.5f, ypos + 0.5f));
