@@ -171,10 +171,10 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 	//creation du SI
 	for (int y = 0; y < SCR_HEIGHT; y++) {
 		SI[y] = std::vector<Maillon>();
-
-		//std::sort(SI[y].begin(), SI[y].end(), sortMaillon);
 	}
 
+	// creation d'une copie de tous les points du polygones; triés d'abord selon leur y, puis leur x (voir la fonction sort ci dessus)
+	// Vector index est un nouveau struct déclaré plus haut, qui permet de se souvenir de l'indice du vector, pour pas que le sort mélange tout
 	std::vector<VectorIndex> orderedPoints;
 	for (int i = 0; i < p.PointCount(); i++) {
 		orderedPoints.push_back({ p.GetPoint(i), i });
@@ -185,18 +185,16 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 	int MIN_Y = orderedPoints[0].v.getY();
 	int MAX_Y = orderedPoints[orderedPoints.size() - 1].v.getY();
 
-	std::vector<int> ys;
 
 	for (int i = 0; i < orderedPoints.size(); i++)
 	{
+		// on parcourt tous les points, en partant du plus bas à gauche (le premier de orderedPoints)
+		//on récupère le point d'avant' et celui d'après (non pas dans orderedList mais dans le vrai polygone de base, dans l'ordre entré par l'utilisateur
 		Vector current = orderedPoints[i].v;
 		Vector prev = p.GetPoint((orderedPoints[i].i - 1) < 0 ? p.PointCount() - 1 : orderedPoints[i].i - 1);
 		Vector next = p.GetPoint((orderedPoints[i].i + 1) % p.PointCount());
 
-		if (orderedPoints[i].i == 4) {
-			int a = 0;
-		}
-
+		// on teste si le segment formé avec le point précédent est susceptible de rentrer dans le SI
 		if (current.getY() < prev.getY()) {
 			float xmin, ymax, ymin;
 
@@ -207,6 +205,7 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 			SI[(int)(current.getY())].push_back({ ymax, xmin, coeff == 0.0f ? 0.0f : 1 / coeff });
 		}
 
+		// on teste si le segment formé avec le point suivant est susceptible de rentrer dans le SI
 		if (current.getY() < next.getY()) {
 			float xmin, ymax, ymin;
 
@@ -216,18 +215,15 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 			float coeff = (current.getY() - next.getY()) / (current.getX() - next.getX());
 			SI[(int)(current.getY())].push_back({ ymax, xmin, coeff == 0.0f ? 0.0f : 1 / coeff });
 		}
-
-		if (SI[(int)(current.getY())].size()) {
-			ys.push_back((int)(current.getY()));
-		}
 	}
 	
+	// on trie les listes du SI (VOIR COURS, d'abord selon leur xmin, puis leur coeff, voir la fonction sortMaillon au dessus)
 	for (int y = 0; y < SCR_HEIGHT; y++) {
 		std::sort(SI[y].begin(), SI[y].end(), sortMaillon);
 	}
 
-	// SI CREE, ALGO LCA
 	
+	//début de l'algo, derniere page du cours tout en bas
 	std::vector<MaillonLCA> lca;
 	for (int y = MIN_Y; y <= MAX_Y; y++)
 	{
@@ -235,7 +231,7 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 		for (int i = 0; i < SI[y].size(); i++)
 		{
 			Maillon a = SI[y][i];
-			float x = a.xmin; // ??
+			float x = a.xmin; 
 			lca.push_back({ a.ymax, x, a.coeffinv, a.xmin });
 		}
 
@@ -256,27 +252,25 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 			lca.erase(lca.begin() + index);
 		}
 
-		// trier
+		// trier (voir cours, même façon que tri SI,, d'abord xmin puis coeff)
 		std::sort(lca.begin(), lca.end(), sortMaillonLCA);
 		
 		// DESSIN
 		int bibi = 0;
 		if (lca.size() != 0) {
 			while (bibi < lca.size() - 1) {
-				if (bibi >= (lca.size() - 1)) {
-					break;
-				}
+				// dessin des lignes, on fait bibi += 2 pour sauter quand on est pas dans le polygone
+				// j'ai appelé la variable bibi au pif
 				DrawLine({ (lca[bibi].x), (float)y }, { lca[bibi + 1].x, (float)y }, c, texture);
 				bibi += 2;
 			}
 		}
 
 		// UPDATE LCA
+		// on met les x à jour selon les pentes des droites (voir cours)
 		for (int i = 0; i < lca.size(); i++)
 		{
 			lca[i].x = (lca[i].x + lca[i].coeffinv);
 		}
-
-		continue;
 	}
 }
