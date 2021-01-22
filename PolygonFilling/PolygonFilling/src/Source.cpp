@@ -253,11 +253,9 @@ int main(void) {
         ImGui_ImplOpenGL3_Init(glsl_version);
 
         bool my_tool_active = true;
-        Polygon  windowPolygon;
+        
         Color polygonColor{ 255, 0, 0, 255 }, windowPolygonColor{ 0, 255, 0, 255 }, cutPolygonColor{ 0, 0, 255, 255 };
         Sutherland sutherland;
-
-        windowPolygon.SetTrigonometric(true);
 
         bool clicked = false;
         MODE mode = POLYGON;
@@ -273,8 +271,14 @@ int main(void) {
         drawnPolygons.push_back(Polygon());
         drawnPolygons[0].SetTrigonometric(true);
 
+        std::vector<Polygon> clippingPolygons;
 
-        bool initial_Polygons = true;
+        clippingPolygons.push_back(Polygon());
+        clippingPolygons[0].SetTrigonometric(true);
+
+
+
+        bool initial_Polygons = false;
 
         if (initial_Polygons) {
             float factor = 1;
@@ -287,19 +291,19 @@ int main(void) {
             drawnPolygons[0].Add({ 12 * factor, 12 * factor });
             drawnPolygons[0].Add({ 3 * factor, 16 * factor });
 
-            windowPolygon.Add({ 0, 0 });
-            windowPolygon.Add({ 400, 0 });
-            windowPolygon.Add({ 400, 400 });
-            windowPolygon.Add({ 0, 400 });*/
+            clippingPolygons[0].Add({ 0, 0 });
+            clippingPolygons[0].Add({ 400, 0 });
+            clippingPolygons[0].Add({ 400, 400 });
+            clippingPolygons[0].Add({ 0, 400 });*/
 
             drawnPolygons[0].Add({ 0 * factor, 40 * factor });
             drawnPolygons[0].Add({ 20 * factor, 20 * factor });
             drawnPolygons[0].Add({ 40 * factor, 20 * factor });
             drawnPolygons[0].Add({ 60 * factor, 40 * factor });
 
-            windowPolygon.Add({ 30, 41 });
-            windowPolygon.Add({ 30, 30 });
-            windowPolygon.Add({ 60, 30 });
+            clippingPolygons[0].Add({ 30, 41 });
+            clippingPolygons[0].Add({ 30, 30 });
+            clippingPolygons[0].Add({ 60, 30 });
 
 
         }
@@ -329,16 +333,25 @@ int main(void) {
                 drawing.DrawPolygon(drawnPolygons[i], polygonColor, renderTexture);
             }
 
-            drawing.DrawPolygon(windowPolygon, windowPolygonColor, renderTexture);
-
-
-            for (int i = 0; i < drawnPolygons.size(); i++)
-            {
-                Polygon cutPolygon = sutherland.Clip(drawnPolygons[i], windowPolygon);
-               
-                drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
-                drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
+            for (int i = 0; i < clippingPolygons.size(); i++) {
+                drawing.DrawPolygon(clippingPolygons[i], windowPolygonColor, renderTexture);
             }
+
+            for (int j = 0; j < clippingPolygons.size(); j++) {
+                for (int i = 0; i < drawnPolygons.size(); i++)
+                {
+                    Polygon cutPolygon = sutherland.Clip(drawnPolygons[i], clippingPolygons[j]);
+
+                    drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
+                    bool fill = false;
+                    if (fill) {
+                        drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
+                    }
+                    
+                }
+            }
+
+            
 
             GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, renderTexture));
             shader.SetUniform1i("u_Texture", slot);
@@ -368,6 +381,10 @@ int main(void) {
                         drawnPolygons.push_back(Polygon());
                         drawnPolygons[drawnPolygons.size() - 1].SetTrigonometric(true);
                     }
+                    if (ImGui::MenuItem("Add clipping polygon", "")) {
+                        clippingPolygons.push_back(Polygon());
+                        drawnPolygons[clippingPolygons.size() - 1].SetTrigonometric(true);
+                    }
                     ImGui::EndMenu();
                 }
                 ImGui::EndMenuBar();
@@ -395,7 +412,11 @@ int main(void) {
                 if (ImGui::BeginMenu("Clear"))
                 {
                     if (ImGui::MenuItem("All", "")) {
-                        windowPolygon.Clear();
+                        clippingPolygons.clear();
+                        clippingPolygons.push_back(Polygon());
+                        clippingPolygons[clippingPolygons.size() - 1].SetTrigonometric(true);
+
+
                         drawnPolygons.clear();
                         drawnPolygons.push_back(Polygon());
                         drawnPolygons[drawnPolygons.size() - 1].SetTrigonometric(true);
@@ -406,7 +427,9 @@ int main(void) {
                         drawnPolygons[drawnPolygons.size() - 1].SetTrigonometric(true);
                     }
                     if (ImGui::MenuItem("Draw window", "")) {
-                        windowPolygon.Clear();
+                        clippingPolygons.clear();
+                        clippingPolygons.push_back(Polygon());
+                        clippingPolygons[clippingPolygons.size() - 1].SetTrigonometric(true);
                     }
                     ImGui::EndMenu();
                 }
@@ -453,12 +476,12 @@ int main(void) {
                     std::cout << "Texture Position at (" << xpos << " : " << ypos << std::endl;
 
                     if (mode == POLYGON) {
-                        drawnPolygons[drawnPolygons.size() - 1].Add(Vector(xpos, ypos)); // + 0.5 because we want them centered
+                        drawnPolygons[drawnPolygons.size() - 1].Add(Vector(xpos, ypos)); 
                         std::cout << drawnPolygons[drawnPolygons.size() - 1].PointCount() << std::endl;
                     }
                     else if (mode == CLIPPING) {
-                        windowPolygon.Add(Vector(xpos, ypos));
-                        std::cout << windowPolygon.PointCount() << std::endl;
+                        clippingPolygons[clippingPolygons.size() - 1].Add(Vector(xpos, ypos));
+                        std::cout << clippingPolygons[clippingPolygons.size() - 1].PointCount() << std::endl;
                     }
                 }
             }

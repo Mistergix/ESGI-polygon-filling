@@ -98,10 +98,10 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 		}
 	}
 
-	/*
+	
 	if (!atLeastOneIntersectionSegmentSegment) {
 		return Polygon();
-	}*/
+	}
 
 	return PL;
 }
