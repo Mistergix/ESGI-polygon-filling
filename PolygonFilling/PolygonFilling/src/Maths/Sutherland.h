@@ -12,4 +12,5 @@ public:
 	bool Visible(Vector S, Vector Fi, Vector Fiplus1, Polygon windowPolygon);
 	Vector Intersection(Vector S, Vector Pj, Vector Fi, Vector Fiplus1);
 	bool IsIntersectionSegmentSegment(Vector S, Vector Pj, Vector Fi, Vector Fiplus1);
+	bool IsPolygonAInsideB(Polygon a, Polygon b);
 };

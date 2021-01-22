@@ -29,9 +29,35 @@ Vector Sutherland::Intersection(Vector S, Vector Pj, Vector Fi, Vector Fiplus1)
 bool Sutherland::IsIntersectionSegmentSegment(Vector S, Vector Pj, Vector Fi, Vector Fiplus1)
 {
 	Mat2 A{ Pj.getX() - S.getX(), Fi.getX() - Fiplus1.getX(), Pj.getY() - S.getY(), Fi.getY() - Fiplus1.getY() };
+
+	if (A.Determinant() == 0.0f) {
+		// parallèle ou confondue
+		return false;
+	}
+
 	Mat2 inv = m_maths.Inverse(A);
 	Vector ts = m_maths.Product(inv, Vector{ Fi.getX() - S.getX(), Fi.getY() - S.getY() });
 	return 0 <= ts.getX() && ts.getX() <= 1 && 0 <= ts.getY() && ts.getY() <= 1;
+}
+
+bool Sutherland::IsPolygonAInsideB(Polygon a, Polygon b)
+{
+	for (int i = 0; i < a.PointCount(); i++)
+	{
+		for (int j = 0; j < b.PointCount(); j++)
+		{
+			Vector A = b.GetPoint(j);
+			Vector B = b.GetPoint((j + 1) % b.PointCount());
+			Vector C = a.GetPoint(i);
+			Vector D = a.GetPoint((i + 1) % a.PointCount());
+
+			if (IsIntersectionSegmentSegment(A, B, C, D)) {
+				return false;
+			}
+		}
+	}
+
+	return b.IsInside(a.GetPoint(0));
 }
 
 bool Sutherland::Visible(Vector S, Vector Fi, Vector Fiplus1, Polygon windowPolygon)
@@ -53,6 +79,10 @@ Polygon Sutherland::Clip(Polygon& poly, Polygon& window)
 {
 	if (poly.PointCount() <= 2 || window.PointCount() <= 2) {
 		return Polygon();
+	}
+
+	if (IsPolygonAInsideB(poly, window)) {
+		return poly;
 	}
 
 	bool atLeastOneIntersectionSegmentSegment = false;
