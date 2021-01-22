@@ -277,17 +277,31 @@ int main(void) {
         bool initial_Polygons = true;
 
         if (initial_Polygons) {
-            drawnPolygons[0].Add({ 30, 50 });
-            drawnPolygons[0].Add({ 150, 10 });
-            drawnPolygons[0].Add({ 270, 90 });
-            drawnPolygons[0].Add({ 270, 190 });
-            drawnPolygons[0].Add({ 120, 120 });
-            drawnPolygons[0].Add({ 30, 160 });
+            float factor = 1;
+            /*
+            
+            drawnPolygons[0].Add({ 3 * factor, 5 * factor });
+            drawnPolygons[0].Add({ 15 * factor, 1 * factor });
+            drawnPolygons[0].Add({ 27 * factor, 9 * factor });
+            drawnPolygons[0].Add({ 27 * factor, 19 * factor });
+            drawnPolygons[0].Add({ 12 * factor, 12 * factor });
+            drawnPolygons[0].Add({ 3 * factor, 16 * factor });
 
             windowPolygon.Add({ 0, 0 });
             windowPolygon.Add({ 400, 0 });
             windowPolygon.Add({ 400, 400 });
-            windowPolygon.Add({ 0, 400 });
+            windowPolygon.Add({ 0, 400 });*/
+
+            drawnPolygons[0].Add({ 0 * factor, 40 * factor });
+            drawnPolygons[0].Add({ 20 * factor, 20 * factor });
+            drawnPolygons[0].Add({ 40 * factor, 20 * factor });
+            drawnPolygons[0].Add({ 60 * factor, 40 * factor });
+
+            windowPolygon.Add({ 30, 41 });
+            windowPolygon.Add({ 30, 30 });
+            windowPolygon.Add({ 60, 30 });
+
+
         }
 
         while (!glfwWindowShouldClose(window))

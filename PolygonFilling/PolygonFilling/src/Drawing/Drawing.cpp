@@ -1,10 +1,17 @@
 #include "Drawing.h"
 #include <map>
 #include <algorithm>
+#include <iostream>
 
 struct Maillon {
-	int ymax, xmin;
+	float ymax, xmin;
 	float coeffinv;
+};
+
+struct MaillonLCA {
+	float ymax, x;
+	float coeffinv;
+	float xmin;
 };
 
 Drawing::Drawing(int w, int h)
@@ -149,11 +156,17 @@ bool sortMaillon(Maillon a, Maillon b) {
 	return a.coeffinv < b.coeffinv;
 }
 
-
+bool sortMaillonLCA(MaillonLCA a, MaillonLCA b) {
+	return sortMaillon({a.ymax, a.xmin, a.coeffinv}, { b.ymax, b.xmin, b.coeffinv });
+}
 
 //LCA
 void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 {
+	if (p.PointCount() <= 2) {
+		return;
+	}
+
 	std::vector<Maillon> SI[SCR_HEIGHT];
 	//creation du SI
 	for (int y = 0; y < SCR_HEIGHT; y++) {
@@ -172,6 +185,8 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 	int MIN_Y = orderedPoints[0].v.getY();
 	int MAX_Y = orderedPoints[orderedPoints.size() - 1].v.getY();
 
+	std::vector<int> ys;
+
 	for (int i = 0; i < orderedPoints.size(); i++)
 	{
 		Vector current = orderedPoints[i].v;
@@ -183,7 +198,7 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 		}
 
 		if (current.getY() < prev.getY()) {
-			int xmin, ymax, ymin;
+			float xmin, ymax, ymin;
 
 			ymax = prev.getY();
 			ymin = current.getY();
@@ -193,7 +208,7 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 		}
 
 		if (current.getY() < next.getY()) {
-			int xmin, ymax, ymin;
+			float xmin, ymax, ymin;
 
 			ymax = next.getY();
 			ymin = current.getY();
@@ -201,86 +216,67 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 			float coeff = (current.getY() - next.getY()) / (current.getX() - next.getX());
 			SI[(int)(current.getY())].push_back({ ymax, xmin, coeff == 0.0f ? 0.0f : 1 / coeff });
 		}
+
+		if (SI[(int)(current.getY())].size()) {
+			ys.push_back((int)(current.getY()));
+		}
 	}
 	
-	return;
+	for (int y = 0; y < SCR_HEIGHT; y++) {
+		std::sort(SI[y].begin(), SI[y].end(), sortMaillon);
+	}
 
-
-	/*
-
-
-
-
+	// SI CREE, ALGO LCA
 	
-
-	std::vector<Maillon> lcas;
-
-
-	SI.insert((int)(orderedPoints[0].v.getY()), lcas);
-
-
-	//creation du SI
-	for (int i = 0; i < p.PointCount() - 1; i++) 
+	std::vector<MaillonLCA> lca;
+	for (int y = MIN_Y; y <= MAX_Y; y++)
 	{
-		Vector a = p.GetPoint(i);
-		Vector b = p.GetPoint(i + 1);
-
-		int xmin, ymax, ymin;
-
-		if (a.getY() < b.getY()) {
-			ymax = b.getY();
-			ymin = a.getY();
-
-			xmin = a.getX();
-		}
-		else {
-			ymax = a.getY();
-			ymin = b.getY();
-
-			xmin = b.getX();
-		}
-
-		if (ymax > MAX_Y) MAX_Y = ymax;
-		if (ymin < MIN_Y) MIN_Y = ymin;
-
-		float coeff = (a.getY() - b.getY()) /( a.getX() - b.getX());
-		
-		Maillon lca;
-		lca.xmin = xmin;
-		lca.ymax = ymax;
-		lca.coeff = coeff == 0.0f ? 0.0f : 1 / coeff;
-		coord.insert({ ymin, lca });
-
-	}
-
-	return;
-
-
-	Maillon current = coord.at(MIN_Y);
-
-	//liste triée, application LCA
-	for (int y = MIN_Y+1; y < MAX_Y; y++) {
-		int x1, x2;
-		
-		if (coord.find(y) == coord.end())//pas trouvé
+		// RAJOUTER si y = ymin
+		for (int i = 0; i < SI[y].size(); i++)
 		{
-			x1 = current.xmin + current.coeff;
+			Maillon a = SI[y][i];
+			float x = a.xmin; // ??
+			lca.push_back({ a.ymax, x, a.coeffinv, a.xmin });
 		}
 
-		else { //trouvé
-			current = coord.at(y);
-			x1 = current.xmin;
-		}
-
-		for (int i = y; i < MAX_Y; i++) {
-			if (coord.find(i) == coord.end()) {
-				break;
+		// RETIRER si y = ymax
+		std::vector<int> indexesToRemove;
+		if (lca.size() != 0) {
+			for (int i = lca.size() - 1; i >= 0; i--)
+			{
+				if (lca[i].ymax == y) {
+					indexesToRemove.push_back(i);
+				}
 			}
-			else {
-				x2 = coord.at(i).xmin + coord.at(i).coeff;
+		}
+
+		for (int i = 0; i < indexesToRemove.size(); i++)
+		{
+			int index = indexesToRemove[i];
+			lca.erase(lca.begin() + index);
+		}
+
+		// trier
+		std::sort(lca.begin(), lca.end(), sortMaillonLCA);
+		
+		// DESSIN
+		int bibi = 0;
+		if (lca.size() != 0) {
+			while (bibi < lca.size() - 1) {
+				if (bibi >= (lca.size() - 1)) {
+					break;
+				}
+				DrawLine({ (lca[bibi].x), (float)y }, { lca[bibi + 1].x, (float)y }, c, texture);
+				bibi += 2;
 			}
 		}
 
-		DrawLine({ (float)x1, (float)y }, { (float)x2, (float)y }, c, texture);
-	}*/
+		// UPDATE LCA
+		for (int i = 0; i < lca.size(); i++)
+		{
+			lca[i].x = (lca[i].x + lca[i].coeffinv);
+		}
+
+		continue;
+	}
 }
