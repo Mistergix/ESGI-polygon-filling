@@ -261,6 +261,7 @@ int main(void) {
         MODE mode = POLYGON;
 
         bool show_colors = false;
+        bool fill = false;
 
         Transform camTransform, objectTransform;
         Camera cam;
@@ -343,7 +344,7 @@ int main(void) {
                     Polygon cutPolygon = sutherland.Clip(drawnPolygons[i], clippingPolygons[j]);
 
                     drawing.DrawPolygon(cutPolygon, cutPolygonColor, renderTexture);
-                    bool fill = false;
+                    
                     if (fill) {
                         drawing.Fill(cutPolygon, cutPolygonColor, renderTexture);
                     }
@@ -367,6 +368,9 @@ int main(void) {
                 {
                     if (ImGui::MenuItem("Show Colors", "")) {
                         show_colors = !show_colors;
+                    }
+                    if (ImGui::MenuItem("Show filling", "")) {
+                        fill = !fill;
                     }
                     ImGui::EndMenu();
                 }
