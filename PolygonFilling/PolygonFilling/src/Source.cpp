@@ -273,6 +273,23 @@ int main(void) {
         drawnPolygons.push_back(Polygon());
         drawnPolygons[0].SetTrigonometric(true);
 
+
+        bool initial_Polygons = true;
+
+        if (initial_Polygons) {
+            drawnPolygons[0].Add({ 30, 50 });
+            drawnPolygons[0].Add({ 150, 10 });
+            drawnPolygons[0].Add({ 270, 90 });
+            drawnPolygons[0].Add({ 270, 190 });
+            drawnPolygons[0].Add({ 120, 120 });
+            drawnPolygons[0].Add({ 30, 160 });
+
+            windowPolygon.Add({ 0, 0 });
+            windowPolygon.Add({ 400, 0 });
+            windowPolygon.Add({ 400, 400 });
+            windowPolygon.Add({ 0, 400 });
+        }
+
         while (!glfwWindowShouldClose(window))
         {
             int width, height;
@@ -422,11 +439,11 @@ int main(void) {
                     std::cout << "Texture Position at (" << xpos << " : " << ypos << std::endl;
 
                     if (mode == POLYGON) {
-                        drawnPolygons[drawnPolygons.size() - 1].Add(Vector(xpos + 0.5f, ypos + 0.5f)); // + 0.5 because we want them centered
+                        drawnPolygons[drawnPolygons.size() - 1].Add(Vector(xpos, ypos)); // + 0.5 because we want them centered
                         std::cout << drawnPolygons[drawnPolygons.size() - 1].PointCount() << std::endl;
                     }
                     else if (mode == CLIPPING) {
-                        windowPolygon.Add(Vector(xpos + 0.5f, ypos + 0.5f));
+                        windowPolygon.Add(Vector(xpos, ypos));
                         std::cout << windowPolygon.PointCount() << std::endl;
                     }
                 }

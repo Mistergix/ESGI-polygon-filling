@@ -1,9 +1,10 @@
 #include "Drawing.h"
 #include <map>
+#include <algorithm>
 
-struct LCA {
-	int xmin, ymax;
-	float coeff;
+struct Maillon {
+	int ymax, xmin;
+	float coeffinv;
 };
 
 Drawing::Drawing(int w, int h)
@@ -104,6 +105,8 @@ void Drawing::DrawLine(Vector a, Vector b, Color c, GLubyte(*texture)[SCR_WIDTH]
 	
 }
 
+
+
 void Drawing::DrawPolygon(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 {
 	if (p.PointCount() < 2) { return; }
@@ -116,59 +119,144 @@ void Drawing::DrawPolygon(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 	}
 }
 
+
+struct VectorIndex {
+	Vector v;
+	int i;
+};
+
+bool sort(VectorIndex a, VectorIndex b) {
+	if (a.v.getY() < b.v.getY()) {
+		return true;
+	}
+
+	if (a.v.getY() > b.v.getY()) {
+		return false;
+	}
+
+	return a.v.getX() < b.v.getX();
+}
+
+bool sortMaillon(Maillon a, Maillon b) {
+	if (a.xmin < b.xmin) {
+		return true;
+	}
+
+	if (a.xmin > b.xmin) {
+		return false;
+	}
+
+	return a.coeffinv < b.coeffinv;
+}
+
+
+
 //LCA
 void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 {
-	std::map<int,LCA> coord;
+	std::vector<Maillon> SI[SCR_HEIGHT];
+	//creation du SI
+	for (int y = 0; y < SCR_HEIGHT; y++) {
+		SI[y] = std::vector<Maillon>();
 
-	int MIN_Y = 1000;
-	int MAX_Y = 0;
+		//std::sort(SI[y].begin(), SI[y].end(), sortMaillon);
+	}
+
+	std::vector<VectorIndex> orderedPoints;
+	for (int i = 0; i < p.PointCount(); i++) {
+		orderedPoints.push_back({ p.GetPoint(i), i });
+	}
+
+	std::sort(orderedPoints.begin(), orderedPoints.end(), sort);
+
+	int MIN_Y = orderedPoints[0].v.getY();
+	int MAX_Y = orderedPoints[orderedPoints.size() - 1].v.getY();
+
+	for (int i = 0; i < orderedPoints.size(); i++)
+	{
+		Vector current = orderedPoints[i].v;
+		Vector prev = p.GetPoint((orderedPoints[i].i - 1) < 0 ? p.PointCount() - 1 : orderedPoints[i].i - 1);
+		Vector next = p.GetPoint((orderedPoints[i].i + 1) % p.PointCount());
+
+		if (orderedPoints[i].i == 4) {
+			int a = 0;
+		}
+
+		if (current.getY() < prev.getY()) {
+			int xmin, ymax, ymin;
+
+			ymax = prev.getY();
+			ymin = current.getY();
+			xmin = current.getX();
+			float coeff = (current.getY() - prev.getY()) / (current.getX() - prev.getX());
+			SI[(int)(current.getY())].push_back({ ymax, xmin, coeff == 0.0f ? 0.0f : 1 / coeff });
+		}
+
+		if (current.getY() < next.getY()) {
+			int xmin, ymax, ymin;
+
+			ymax = next.getY();
+			ymin = current.getY();
+			xmin = current.getX();
+			float coeff = (current.getY() - next.getY()) / (current.getX() - next.getX());
+			SI[(int)(current.getY())].push_back({ ymax, xmin, coeff == 0.0f ? 0.0f : 1 / coeff });
+		}
+	}
+	
+	return;
+
+
+	/*
+
+
+
+
+	
+
+	std::vector<Maillon> lcas;
+
+
+	SI.insert((int)(orderedPoints[0].v.getY()), lcas);
+
 
 	//creation du SI
 	for (int i = 0; i < p.PointCount() - 1; i++) 
 	{
 		Vector a = p.GetPoint(i);
 		Vector b = p.GetPoint(i + 1);
-		int ymax = (a.getY() < b.getY() ? b.getY() : a.getY());
-		int ymin = (a.getY() > b.getY() ? b.getY() : a.getY());
-		int xmin;
 
-		if (a.getY() == ymin) {
+		int xmin, ymax, ymin;
+
+		if (a.getY() < b.getY()) {
+			ymax = b.getY();
+			ymin = a.getY();
+
 			xmin = a.getX();
 		}
 		else {
+			ymax = a.getY();
+			ymin = b.getY();
+
 			xmin = b.getX();
 		}
 
 		if (ymax > MAX_Y) MAX_Y = ymax;
 		if (ymin < MIN_Y) MIN_Y = ymin;
 
-		float coeff = (a.getY() - b.getY() / a.getX() - b.getX());
+		float coeff = (a.getY() - b.getY()) /( a.getX() - b.getX());
 		
-		LCA lca;
+		Maillon lca;
 		lca.xmin = xmin;
 		lca.ymax = ymax;
-		lca.coeff = 1 / coeff;
+		lca.coeff = coeff == 0.0f ? 0.0f : 1 / coeff;
 		coord.insert({ ymin, lca });
 
 	}
 
-	//tri
-	/*for (int i = 0; i < coord.size()-1; i++) {
-		CHEH tmp;
-		for(int j = 1; j < coord.size(); j++)
-		{
-			if (coord.at(i).ymin > coord.at(j).ymin) 
-			{
-				tmp = coord.at(i);
-				coord.at(i) = coord.at(j);
-				coord.at(j) = tmp;
-			}
-		}
-	}
-	*/
+	return;
 
-	LCA current = coord.at(MIN_Y);
+
+	Maillon current = coord.at(MIN_Y);
 
 	//liste triée, application LCA
 	for (int y = MIN_Y+1; y < MAX_Y; y++) {
@@ -194,5 +282,5 @@ void Drawing::Fill(Polygon p, Color c, GLubyte(*texture)[SCR_WIDTH][4])
 		}
 
 		DrawLine({ (float)x1, (float)y }, { (float)x2, (float)y }, c, texture);
-	}
+	}*/
 }
